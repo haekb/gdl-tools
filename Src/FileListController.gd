@@ -1,9 +1,12 @@
 extends Tree
 
 onready var ui_controller = get_node("../../")
+onready var texture_builder = load("res://Addons/GDLFormat/TextureBuilder.gd").new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	assert(ui_controller)
+	assert(texture_builder)
 	
 	self.connect("item_activated", self, "on_item_activated")
 	
@@ -26,6 +29,8 @@ func on_item_activated():
 	
 	var model = ui_controller.loaded_model
 	var model_item = null
+	var file_path = ui_controller.loaded_path
+	var extension = ui_controller.loaded_extension
 	
 	if parent_text == "Objects":
 		var index = 0
@@ -42,7 +47,7 @@ func on_item_activated():
 				index = tex_def.index
 				break
 		model_item = model.rom_texs[index]
-	
+		self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
 	
 	
 	pass

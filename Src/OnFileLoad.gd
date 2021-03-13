@@ -10,7 +10,7 @@ func object_loader(path):
 	self.loaded_model = obj_model
 	
 	var root = file_list.create_item()
-	root.set_text(0, "Objects.ps2")
+	root.set_text(0, "%s" % path.get_file())
 	
 	var objs = file_list.create_item(root)
 	objs.set_text(0, "Objects")
@@ -47,7 +47,7 @@ func on_file_load(path : String):
 	# Clean up
 	file_list.clear()
 	
-	if "objects.ps2" in path.to_lower():
+	if "objects." in path.to_lower():
 		self.object_loader(path.to_lower())
 	# End If
 	

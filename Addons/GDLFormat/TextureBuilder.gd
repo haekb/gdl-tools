@@ -5,7 +5,7 @@ func _ready():
 	#self.build("D:\\GameDev\\opengdl\\GameData\\STATIC\\textures.ps2", [])
 	pass
 
-func build(source_file, options):
+func build(source_file, rom_tex, options):
 	var file = File.new()
 	if file.open(source_file, File.READ) != OK:
 		print("Failed to open %s" % source_file)
@@ -14,9 +14,9 @@ func build(source_file, options):
 	print("Opened %s" % source_file)
 	
 	
-	if ".ngc" in source_file:
-		file.set_endian_swap(true)
-		print("Nintendo Gamecube file detected. Swapping endian.")
+	#if ".ngc" in source_file:
+	#	file.set_endian_swap(true)
+	#	print("Nintendo Gamecube file detected. Swapping endian.")
 	
 	var path = "%s/Models/Textures.gd" % self.get_script().get_path().get_base_dir()
 	var tex_file = load(path)
@@ -24,7 +24,7 @@ func build(source_file, options):
 	# Model as in MVC model, not mesh model!
 	var model = tex_file.Textures.new()
 	
-	var response = model.read(file)
+	var response = model.read(file, rom_tex)
 	
 	file.close()
 	

@@ -199,7 +199,7 @@ class Objects:
 		var height_log2 = 0
 		var flags = 0
 		var tex_palette_index = 0
-		var tex_base = 0
+		var tex_data_pointer = 0 # Was tex_base
 		var tex_palette_count = 0
 		var tex_shift_index = 0
 		var frame_count = 0
@@ -222,7 +222,7 @@ class Objects:
 			self.height_log2 = f.get_16()
 			self.flags = f.get_16()
 			self.tex_palette_index = f.get_16()
-			self.tex_base = f.get_32()
+			self.tex_data_pointer = f.get_32()
 			self.tex_palette_count = f.get_16()
 			self.tex_shift_index = f.get_16()
 			self.frame_count = f.get_16()
