@@ -47,7 +47,7 @@ func on_item_activated():
 				index = tex_def.index
 				break
 		model_item = model.rom_texs[index]
-		self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
+		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
 	
 	
 	pass

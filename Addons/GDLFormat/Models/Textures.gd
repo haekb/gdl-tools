@@ -23,88 +23,12 @@ class TextureFormat:
 	static func cast(data, width, height, flags, format):
 		var return_data = []
 		
+		print("FORMAT %d" % format)
+		
 		var processors = load('res://Src/Processors/processors.gd').Processors.new()
 		
 		return_data = processors.process(data, width, height, flags, format)
-#
-#		if format == Formats.IDX_4_A_4:
-#
-#			var previous_pixel = 0
-#			var read_alpha = false
-#			var adjust_half_res = false
-#
-#			var pos = 0
-#			var full_size = len(data)
-#			var size = full_size / 2
-#
-#			var data_b = data.slice(size, full_size)
-#
-#			var slice_w = width# / 2
-#			var slice_h = height# / 2
-#
-#			if flags & TextureFormat.FLAG_HALF_RES:
-#				slice_w = width / 4
-#				slice_h = height / 2
-#
-#			var image1 = Image.new()
-#			image1.create_from_data(slice_w, slice_h, false, Image.FORMAT_R8, data_b)
-#			image1.save_png("./dump.png")
-#
-#			while pos < size:# - 1:
-#				var pixel = data[pos]
-#				#var pixel2 = data_b[pos]
-#
-#				return_data.append(pixel) # R
-#				return_data.append(pixel) # G
-#				return_data.append(pixel) # B
-#				return_data.append(255) # A
-#
-#				if flags & TextureFormat.FLAG_HALF_RES:
-#					return_data.append(pixel) # R
-#					return_data.append(pixel) # G
-#					return_data.append(pixel) # B
-#					return_data.append(255) # A
-#				# End If
-#
-#				return_data.append(pixel) # R
-#				return_data.append(pixel) # G
-#				return_data.append(pixel) # B
-#				return_data.append(255) # A
-##
-#				if flags & TextureFormat.FLAG_HALF_RES:
-#					return_data.append(pixel) # R
-#					return_data.append(pixel) # G
-#					return_data.append(pixel) # B
-#					return_data.append(255) # A
-#				# End If
-#
-#				return_data.append(pixel) # R
-#				return_data.append(pixel) # G
-#				return_data.append(pixel) # B
-#				return_data.append(255) # A
-##
-#				if flags & TextureFormat.FLAG_HALF_RES:
-#					return_data.append(pixel) # R
-#					return_data.append(pixel) # G
-#					return_data.append(pixel) # B
-#					return_data.append(255) # A
-#				# End If
-#
-#				return_data.append(pixel) # R
-#				return_data.append(pixel) # G
-#				return_data.append(pixel) # B
-#				return_data.append(255) # A
-##
-#				if flags & TextureFormat.FLAG_HALF_RES:
-#					return_data.append(pixel) # R
-#					return_data.append(pixel) # G
-#					return_data.append(pixel) # B
-#					return_data.append(255) # A
-#				# End If
-#
-#				pos += 1
-#			# End While
-#
+
 #		# 1024 byte palette - 4 bytes each, 256 entries
 #		elif format == Formats.IDX_8_ABGR_8888:
 #			var palette_img = Image.new()
@@ -166,18 +90,13 @@ class TextureFormat:
 #				current_pos += 1
 #			# End While
 #		# End If
-		
-		var image = Image.new()
-		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
-		#image.resize(width, height, Image.INTERPOLATE_NEAREST)
-		image.save_png("./dump.png")
-		
+
 		return return_data
 	# End Func
 # End Class
 
 class Textures:
-	var texture = null
+	var image = null
 	
 	func read_texture(f : File, width, height, flags, format):
 		var read_width = width
@@ -188,12 +107,6 @@ class Textures:
 		if flags & Constants.Tex_Flags.HALF_RES:
 			read_width /= 2
 			read_height /= 2
-		
-		#if flags & TextureFormat.FLAG_HAS_ALPHA:
-		#	bytes += 1
-		# End If
-		
-
 		
 		var read = read_width * read_height * bytes
 		
@@ -211,15 +124,12 @@ class Textures:
 
 		var tex_data_rgb888a = TextureFormat.cast(tex_data, width, height, flags, format)
 		
-		var image = Image.new()
-		#image.create_from_data(width, height, false, Image.FORMAT_R8, tex_data)
-		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, tex_data_rgb888a)
-		image.save_png("./texture_test.png")
+#		var image = Image.new()
+#		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, tex_data_rgb888a)
+#		image.save_png("./texture_test.png")
 		
 		return tex_data_rgb888a
 	# End Func
-		
-	enum IMPORT_RETURN{SUCCESS, ERROR}
 
 	func read(f : File, rom_tex):
 		var size = rom_tex.size
@@ -230,15 +140,8 @@ class Textures:
 		
 		f.seek(rom_tex.tex_data_pointer)
 		
-		self.texture = read_texture(f, width, height, flags, format)
+		self.image = read_texture(f, width, height, flags, format)
 		
-		return self._make_response(IMPORT_RETURN.SUCCESS)
-	# End Func
-	
-	#
-	# Helpers
-	# 
-	func _make_response(code, message = ''):
-		return { 'code': code, 'message': message }
+		return Helpers.make_response(Helpers.IMPORT_RETURN.SUCCESS)
 	# End Func
 # End Class

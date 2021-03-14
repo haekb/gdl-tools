@@ -17,6 +17,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Constants="*res://Src/constants.gd"
+Helpers="*res://Src/helpers.gd"
 
 [physics]
 
