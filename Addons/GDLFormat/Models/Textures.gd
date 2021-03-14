@@ -121,7 +121,7 @@ class Textures:
 			read_width /= 2
 			read_height /= 2
 		
-		var read = read_width * read_height * bytes
+		var read = read_width * read_height * 2
 		
 		# Include the palette
 		if format == Constants.Tex_Formats.IDX_8_ABGR_8888:

@@ -34,6 +34,6 @@ func build(source_file, rom_tex, options):
 		
 	var texture = ImageTexture.new()
 	texture.create_from_image(model.image)
-	texture.set_flags(ImageTexture.FLAGS_DEFAULT + ImageTexture.FLAG_ANISOTROPIC_FILTER + ImageTexture.FLAG_CONVERT_TO_LINEAR)
+	texture.set_flags(ImageTexture.FLAGS_DEFAULT)
 	
 	return texture

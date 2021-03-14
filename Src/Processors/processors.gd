@@ -1,6 +1,7 @@
 class Processors:
 	# See: https://openkh.dev/common/tm2.html and https://psi-rockin.github.io/ps2tek/ (GS Textures)
 	var processors = {
+		Constants.Tex_Formats.ABGR_1555: load('res://Src/Processors/texture_abgr_1555.gd').Texture_ABGR_1555,
 		Constants.Tex_Formats.IDX_4_A_4: load('res://Src/Processors/texture_4_a_4.gd').Texture_4_A_4,
 		Constants.Tex_Formats.IDX_8_A_8: load('res://Src/Processors/texture_8_a_8.gd').Texture_8_A_8,
 	}
