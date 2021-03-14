@@ -20,10 +20,10 @@ class Texture_8_A_8:
 		# End For
 		
 		# Debug
-		var img = Image.new()
-		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
-		img.save_png("./texture_8_a_8.png")
+#		var img = Image.new()
+#		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
+#		img.save_png("./texture_8_a_8.png")
 
-		return data
+		return image_data
 	# End Func
 # End Class

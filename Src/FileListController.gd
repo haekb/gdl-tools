@@ -2,11 +2,13 @@ extends Tree
 
 onready var ui_controller = get_node("../../")
 onready var texture_builder = load("res://Addons/GDLFormat/TextureBuilder.gd").new()
+onready var image_viewer = get_node("../../ImageViewer/Image") as TextureRect
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	assert(ui_controller)
 	assert(texture_builder)
+	assert(image_viewer)
 	
 	self.connect("item_activated", self, "on_item_activated")
 	
@@ -48,6 +50,7 @@ func on_item_activated():
 				break
 		model_item = model.rom_texs[index]
 		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
+		image_viewer.texture = imgTex
 	
 	
 	pass

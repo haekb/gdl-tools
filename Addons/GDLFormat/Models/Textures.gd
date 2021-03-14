@@ -90,8 +90,21 @@ class TextureFormat:
 #				current_pos += 1
 #			# End While
 #		# End If
-
-		return return_data
+		
+		var image = Image.new()
+		
+		
+		if flags & Constants.Tex_Flags.HALF_RES:
+			image.create_from_data(width / 2, height / 2, false, Image.FORMAT_RGBA8, return_data)
+			image.resize(width, height, Image.INTERPOLATE_NEAREST)
+		else:
+			image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
+		# End If
+		
+		#image.resize(width, height, Image.INTERPOLATE_NEAREST)
+		#image.save_png("./dump.png")
+		
+		return image
 	# End Func
 # End Class
 

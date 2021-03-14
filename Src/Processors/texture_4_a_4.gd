@@ -51,11 +51,11 @@ class Texture_4_A_4:
 		# End While
 		
 		# Debug
-#		var img = Image.new()
+		var img = Image.new()
 #		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
-#		img.resize(full_width, full_height, Image.INTERPOLATE_NEAREST)
+#		#img.resize(full_width, full_height, Image.INTERPOLATE_NEAREST)
 #		img.save_png("./texture_4_a_4.png")
 
-		return data
+		return image_data
 	# End Func
 # End Class
