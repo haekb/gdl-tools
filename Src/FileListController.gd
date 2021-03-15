@@ -54,15 +54,24 @@ func on_item_activated():
 		var obj_data = model.obj_data[index]
 		var obj_def = model.obj_defs[index]
 		
-		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, [])
-		var mesh_instance = MeshInstance.new()
-		
-		mesh_instance.name = obj_def.name
-		mesh_instance.mesh = mesh_array
-		
-		mesh_viewer.add_child(mesh_instance)
-		
-		self.image_viewer.visible = false
+		if obj_data != null:
+			var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, [])
+			var mesh_instance = MeshInstance.new()
+			
+			mesh_instance.name = obj_def.name
+			mesh_instance.mesh = mesh_array
+			
+			var tex_index = model_item.sub_obj_0_tex_index
+			var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model.rom_texs[tex_index], [])
+			
+			var mat = SpatialMaterial.new()
+			mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
+			
+			mesh_instance.set_surface_material(0, mat)
+			
+			mesh_viewer.add_child(mesh_instance)
+			
+			self.image_viewer.visible = false
 		
 	elif parent_text == "Textures":
 		var index = metadata['id']

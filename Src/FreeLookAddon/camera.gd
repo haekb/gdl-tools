@@ -23,12 +23,12 @@ var _e = false
 
 # Default bindings
 var bindings = {
-#	KEY_W : "move_forwards",
-#	KEY_S : "move_backwards",
-#	KEY_A : "move_left",
-#	KEY_D : "move_right",
-#	KEY_Q : "move_up",
-#	KEY_E : "move_down",
+	KEY_W : "move_forwards",
+	KEY_S : "move_backwards",
+	KEY_A : "move_left",
+	KEY_D : "move_right",
+	KEY_Q : "move_up",
+	KEY_E : "move_down",
 }
 
 func read_keys_from_config():

@@ -26,7 +26,7 @@ func build(name, rom_obj, obj_data, options):
 				indexes.append([p1, p2, p3])
 			# End If
 			
-			uvs.append(obj_data.uvs[p1].uv)
+			#uvs.append(obj_data.uvs[p1].uv)
 			
 			flip = not flip
 		# End If
@@ -61,12 +61,12 @@ func build(name, rom_obj, obj_data, options):
 	for i in range(len(indexes)):
 		#var vertex = vertices[vi]
 		var index = indexes[i]
-		var uv = uvs[i]
+		var uv = obj_data.uvs[i].uv
 		
 		var verts = []
 		
+		st.add_uv(uv)
 		for vi in index:
-			st.add_uv(uv)
 			st.add_vertex(vertices[vi])
 		# End For
 	# End For
