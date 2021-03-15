@@ -35,3 +35,30 @@ enum Tex_Flags {
 	INVALID = 256,
 	DUAL_TEX = 512,
 }
+
+enum Model_Flags {
+	ALPHA = 1,
+	VNORMS = 2,
+	VCOLORS = 4,
+	MESH = 8,
+	TEX2 = 16,
+	LMAP = 32,
+	SHARP = 64,
+	BLUR = 128,
+	CHROME = 256,
+	ERROR = 512,
+	SORTA = 1024,
+	SORT =  2048,
+	# ?
+	FMT_BASIC = 0,
+	FMT_MASK = 61440,
+	# ?
+	LIT_MASK = 983040,
+	# Lighting settings
+	NON_LIT = 0,
+	PRE_LIT = 65536,
+	LMAP_LIT = 131072,
+	NORM_LIT = 196608,
+	DYN_LIGHT = 1048576,
+	END = 1048577,
+}

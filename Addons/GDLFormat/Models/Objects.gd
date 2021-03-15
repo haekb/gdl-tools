@@ -28,7 +28,7 @@ class Objects:
 	var rom_objs = []
 	var rom_texs = []
 	
-	enum IMPORT_RETURN{SUCCESS, ERROR}
+	var obj_data = []
 	
 	func read(f : File):
 		self.dir_name = f.get_buffer(32).get_string_from_ascii()
@@ -96,7 +96,24 @@ class Objects:
 			self.rom_texs.append(rom_tex)
 		# End For
 		
-		return self._make_response(IMPORT_RETURN.SUCCESS)
+		var last_position = f.get_position()
+		for i in range(self.rom_obj_count):
+			var rom_obj = self.rom_objs[i]
+			
+			# No data here!
+			if rom_obj.data_pointer == 0:
+				# Make sure indexes align with rom_obj!!
+				self.obj_data.append(null)
+				continue
+			
+			f.seek(rom_obj.data_pointer)
+			
+			var obj = ObjData.new()
+			obj.read(self, rom_obj, f)
+			self.obj_data.append(obj)
+		# End For
+		
+		return Helpers.make_response(Helpers.IMPORT_RETURN.SUCCESS)
 	# End Func
 	
 	class ObjDef:
@@ -258,12 +275,250 @@ class Objects:
 		# End Func
 	# End Class
 	
-	#
-	# Helpers
-	# 
-	func _make_response(code, message = ''):
-		return { 'code': code, 'message': message }
-	# End Func
+	class ObjData:
+		# PS2 related geometry flags
+		const VIF_MSCAL = 0x14000000
+		const VIF_MSCNT = 0x17000000
+		
+		# Constants for various things
+		const OBJ_START_SIGNATURE = 0x6C018000
+		
+		const SIGNAL_MODE_UNK_5BYTE = 0x6F # V4-5 - 4 Items packed in 5 bytes
+		const SIGNAL_MODE_UNK_8BYTE = 0x6D # V4-16 (4 items, 16 bytes) # Possibly level-based
+		const SIGNAL_MODE_UNK_2BYTE = 0x66 # V2-8 (2 items, 8 bytes)
+		# Confirmed
+		const SIGNAL_MODE_HEADER = 0x6C # V4-32 (4 items, 32 bytes) (Doesn't quite line up..)
+		# Vertex
+		const SIGNAL_MODE_CHAR_3 = 0x6A
+		const SIGNAL_MODE_SHORT_3 = 0x69
+		# UV
+		const SIGNAL_MODE_CHAR_2 = 0x66
+		const SIGNAL_MODE_SHORT_2 = 0x65
+		# Flip Vert related
+		const SIGNAL_MODE_INT_4 = 0x6F
+		
+		# Helper classes
+		class Vertex:
+			var vector = Vector3()
+			
+			func read(mode, f : File):
+				if mode == SIGNAL_MODE_CHAR_3:
+					self.vector = Vector3( Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()) )
+				elif mode == SIGNAL_MODE_SHORT_3:
+					self.vector = Vector3( Helpers.utsh(f.get_16()), Helpers.utsh(f.get_16()), Helpers.utsh(f.get_16()) )
+				else: # Unknown!
+					self.vector = Vector3( Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()) )
+				# End If
+			# End Func
+		# End Class
+		
+		class UV:
+			var uv = Vector2()
+			
+			func read(mode, f : File):
+				# Divided by max value of the type
+				if mode == SIGNAL_MODE_CHAR_2:
+					var u = Helpers.utsb(f.get_8())
+					var v = Helpers.utsb(f.get_8())
+					self.uv = Vector2( float( u ) / 128.0, float( v ) / 128.0 )
+				elif mode == SIGNAL_MODE_SHORT_2:
+					var u = Helpers.utsh(f.get_16())
+					var v = Helpers.utsh(f.get_16())
+					self.uv = Vector2( float( u) / 32768.0, float( v ) / 32768.0 )
+				else:
+					var u = Helpers.utsb(f.get_8())
+					var v = Helpers.utsb(f.get_8())
+					self.uv = Vector2( float( u ) / 128.0, float( v ) / 128.0 )
+				# End If
+			# End Func
+		# End Class
+		
+		class SkipVertex:
+			var byte_1 = 0
+			var byte_2 = 0
+			var skip = false
+			
+			func read(f : File):
+				# Still unsure how this all works, but it does work!
+				self.byte_1 = f.get_8()
+				self.byte_2 = f.get_8()
+				self.skip = bool( self.byte_2 >> 7 )
+			# End Func
+		# End Class
+		
+		class Signal:
+			var index = 0
+			var constant = 0
+			var data_count = 0
+			var mode = 0
+			var signature = 0x0
+			
+			func read(f : File):
+				self.signature = f.get_32()
+				# Go back and let's actually read the signature!
+				f.seek(f.get_position() - 4)
+				
+				self.index = f.get_8()
+				self.constant = f.get_8()
+				self.data_count = f.get_8()
+				self.mode = f.get_8()
+			# End Func
+			
+			func get_mode_string():
+				if self.is_header():
+					return "Header"
+				elif self.is_vertex():
+					return "Vertex"
+				elif self.is_uv():
+					return "UV"
+				elif self.is_skip_vertex():
+					return "Skip Vertex"
+				return "Unknown"
+			# End Func
+			
+			func is_header():
+				return self.mode in [SIGNAL_MODE_HEADER]
+			# End Func
+			
+			func is_vertex():
+				return self.mode in [SIGNAL_MODE_CHAR_3, SIGNAL_MODE_SHORT_3]
+			# End Func
+			
+			func is_uv():
+				return self.mode in [SIGNAL_MODE_CHAR_2, SIGNAL_MODE_SHORT_2]
+			# End Func
+			
+			func is_skip_vertex():
+				return self.mode in [SIGNAL_MODE_INT_4]
+			# End Func
+		# End Class
+
+		# Good reference: https://github.com/ps2dev/ps2sdk/blob/8b7579979db87ace4b0aa5693a8a560d15224a96/common/include/vif_codes.h
+		class VUCommand:
+			var command = 0
+			
+			func read(f : File):
+				f.seek(f.get_position() + 3)
+				self.command = f.get_8()
+			# End Func
+			
+			func get_command_string():
+				if self.command == 0x14:
+					return "MSCAL (0x14)"
+				elif self.command == 0x17:
+					return "MSCNT (0x17)"
+				return "Unknown %d" % self.command
+			# End Func
+		# End Class
+		
+		# End helper classes
+		
+		# Properties
+		var vertices = []
+		var skip_vertices = []
+		var uvs = []
+		var unk_vec2 = []
+		
+		func read(Obj : Objects, rom_obj: RomObj, f : File):
+			# This includes the main mesh
+			var obj_count = rom_obj.sub_obj_count
+			
+			var obj_vertices = []
+			var obj_uvs = []
+			var obj_skip_vertices = []
+			var obj_unk_vec2 = []
+			
+			var last_position = 0
+			while obj_count > 0:
+				obj_count -= 1
+				
+				last_position = f.get_position()
+				var unpack_command = f.get_32()
+				
+				# Skip past two unknown shorts
+				f.seek(f.get_position() + 4)
+				
+				var current_position = f.get_position()
+				# Data packet size, needs to be truncated to 32-bits
+				var unpack_size = (unpack_command << 4) & 0xFFFFFFFF
+				var total_size = 0
+				
+				if unpack_size > 10000:
+					print("[ObjData::read] Unusually large unpack size at [%d]" % f.get_position())
+				# End If
+				
+				# SubObj Count - 1 is how much extra data we have
+				# ---
+				# Once we hit unpack size, check if we'll bleed into another object,
+				# if not, then check if there's a new "unpack_command". 
+				# If there is, mark it as merge with previous then grab that mesh data.
+				while total_size < unpack_size:
+					
+					while true:
+						Helpers.align(4, f)
+						
+						var ps2_signal = Signal.new()
+						ps2_signal.read(f)
+						
+						if ps2_signal.is_header():
+							f.seek((4 * 2) + f.get_position())
+							
+							obj_unk_vec2.append(Vector2( f.get_float(), f.get_float() ))
+						elif ps2_signal.is_vertex():
+							for _i in range(ps2_signal.data_count - 1):
+								var debug_pos = f.get_position()
+								var vertex = Vertex.new()
+								vertex.read(ps2_signal.mode, f)
+								obj_vertices.append(vertex)
+							# End For
+							
+							# Skip over data padding
+							if ps2_signal.mode == SIGNAL_MODE_CHAR_3:
+								f.seek(3 + f.get_position())
+							elif ps2_signal.mode == SIGNAL_MODE_SHORT_3:
+								f.seek(6 + f.get_position())
+							# End if
+							
+						elif ps2_signal.is_uv():
+							for _i in range(ps2_signal.data_count):
+								var uv = UV.new()
+								uv.read(ps2_signal.mode, f)
+								obj_uvs.append(uv)
+							# End For
+						elif ps2_signal.is_skip_vertex():
+							for _i in range(ps2_signal.data_count):
+								var skip_vertex = SkipVertex.new()
+								skip_vertex.read(f)
+								obj_skip_vertices.append(skip_vertex)
+							# End For
+						else:
+							print("[ObjData::read] Unknown signal %d at %d! Breaking from loop." % [ps2_signal.mode, f.get_position()])
+							break
+						# End If
+						
+						# We hit the uvs, now we can exit out
+						if ps2_signal.index >= 4:
+							break
+						# End If
+					# End While
+					
+					Helpers.align(4, f)
+					
+					# Check for VIF commands
+					var vif_commands = f.get_32()
+					
+					current_position = f.get_position()
+					total_size = current_position - last_position
+				# End While
+				Helpers.align(16, f)
+			# End While
+			self.vertices = obj_vertices
+			self.uvs = obj_uvs
+			self.skip_vertices = obj_skip_vertices
+			self.unk_vec2 = obj_unk_vec2
+		# End Func
+		
+	# End Class
 # End Class
 
 

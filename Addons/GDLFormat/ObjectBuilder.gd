@@ -23,7 +23,7 @@ func build(source_file, options):
 	
 	file.close()
 	
-	if response.code == model.IMPORT_RETURN.ERROR:
+	if response.code == Helpers.IMPORT_RETURN.ERROR:
 		print("IMPORT ERROR: %s" % response.message)
 		return null
 		
