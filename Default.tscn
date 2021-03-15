@@ -1,11 +1,10 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Src/FreeLookAddon/camera.gd" type="Script" id=1]
 [ext_resource path="res://Src/OnFileLoad.gd" type="Script" id=2]
 [ext_resource path="res://Src/UIController.gd" type="Script" id=3]
 [ext_resource path="res://Themes/Default.tres" type="Theme" id=4]
 [ext_resource path="res://Src/FileListController.gd" type="Script" id=5]
-[ext_resource path="res://dump.png" type="Texture" id=6]
 
 [node name="Scene" type="Spatial"]
 
@@ -64,7 +63,6 @@ __meta__ = {
 [node name="Image" type="TextureRect" parent="UI/ImageViewer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-texture = ExtResource( 6 )
 stretch_mode = 6
 __meta__ = {
 "_edit_use_anchors_": true

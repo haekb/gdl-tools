@@ -10,13 +10,6 @@ class Texture_4_A_4:
 		var full_width = width
 		var full_height = height
 		
-		# Probably wrong
-		if flags & Constants.Tex_Flags.HALF_RES:
-			width /= 2
-			height /= 2
-			working_width /= 2
-			working_height /= 2
-		
 		var repeated_line = false
 		var y = 0
 

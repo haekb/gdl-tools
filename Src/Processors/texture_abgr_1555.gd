@@ -10,13 +10,6 @@ class Texture_ABGR_1555:
 		var full_width = width
 		var full_height = height
 		
-		# Probably wrong
-		if flags & Constants.Tex_Flags.HALF_RES:
-			width /= 2
-			height /= 2
-			working_width /= 2
-			working_height /= 2
-		
 		var repeated_line = false
 		var y = 0
 
@@ -53,9 +46,9 @@ class Texture_ABGR_1555:
 		# End While
 
 		# Debug
-		var img = Image.new()
-		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
-		img.save_png("./texture_abgr_1555.png")
+#		var img = Image.new()
+#		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
+#		img.save_png("./texture_abgr_1555.png")
 
 		return image_data
 	# End Func

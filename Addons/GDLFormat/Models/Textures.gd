@@ -28,78 +28,9 @@ class TextureFormat:
 		var processors = load('res://Src/Processors/processors.gd').Processors.new()
 		
 		return_data = processors.process(data, width, height, flags, format)
-
-#		# 1024 byte palette - 4 bytes each, 256 entries
-#		elif format == Formats.IDX_8_ABGR_8888:
-#			var palette_img = Image.new()
-#			var palette = []
-#			var palette_stream = StreamPeerBuffer.new()
-#			var size = width * height
-#			var data_len = len(data)
-#			var pos = 0
-#
-#			while pos < 1024:
-#				palette.append(data[pos])
-#				pos += 1
-#			# End While
-#
-#			pos = 0
-#
-#			palette_stream.set_data_array(palette)
-#			palette = []
-#
-#			palette_stream.seek(0)
-#
-#			while pos < 256:
-#
-#				palette.append(palette_stream.get_8())
-#				palette.append(palette_stream.get_8())
-#				palette.append(palette_stream.get_8())
-#				palette_stream.get_8()
-#				palette.append(255) # Alpha
-#				pos += 1
-#			# End While
-#
-#			palette_img.create_from_data(64, 4, false, Image.FORMAT_RGBA8, palette)
-#			palette_img.save_png("./palette.png")
-#
-#			pos = 1024
-#			var current_pos = 0
-#			while pos < data_len:
-#				palette_stream.seek(0)
-#
-#				if current_pos == 128:
-#					pass
-#
-#				var index = data[pos]
-#				palette_stream.seek(index * 4)
-#
-#				var r = TextureFormat.signed_to_unsigned(palette_stream.get_8())
-#				var g = TextureFormat.signed_to_unsigned(palette_stream.get_8())
-#				var b = TextureFormat.signed_to_unsigned(palette_stream.get_8())
-#				var a = TextureFormat.signed_to_unsigned(palette_stream.get_8())
-#
-#				a = 255
-#
-#				return_data.append( r )
-#				return_data.append( g )
-#				return_data.append( b )
-#				return_data.append( a )
-#
-#				pos += 1
-#				current_pos += 1
-#			# End While
-#		# End If
 		
 		var image = Image.new()
-		
-		
-		if flags & Constants.Tex_Flags.HALF_RES:
-			image.create_from_data(width / 2, height / 2, false, Image.FORMAT_RGBA8, return_data)
-			image.resize(width, height, Image.INTERPOLATE_NEAREST)
-		else:
-			image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
-		# End If
+		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
 		
 		#image.resize(width, height, Image.INTERPOLATE_NEAREST)
 		#image.save_png("./dump.png")
@@ -117,15 +48,21 @@ class Textures:
 		var bytes = 1
 		
 		var tex_data = []
-		if flags & Constants.Tex_Flags.HALF_RES:
-			read_width /= 2
-			read_height /= 2
+		#if flags & Constants.Tex_Flags.HALF_RES:
+		#	read_width /= 2
+		#	read_height /= 2
 		
-		var read = read_width * read_height * 2
+		var read = read_width * read_height
+		
+		# TODO: Figure out how to stick these in the processors...
 		
 		# Include the palette
 		if format == Constants.Tex_Formats.IDX_8_ABGR_8888:
 			read += 1024
+			
+		if format == Constants.Tex_Formats.ABGR_1555:
+			# Two bytes per pixel
+			read *= 2
 		
 		if !f.endian_swap:
 			tex_data = Array(f.get_buffer(read))

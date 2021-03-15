@@ -3,11 +3,6 @@ class Texture_8_A_8:
 		var data_len = len(data)
 		var image_data = []
 		
-		# Probably wrong
-		if flags & Constants.Tex_Flags.HALF_RES:
-			width /= 2
-			height /= 2
-		
 		for y in range(height):
 			for x in range(width):
 				var pixel = data[ y * width + x ]
