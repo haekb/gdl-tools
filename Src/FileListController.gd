@@ -24,6 +24,7 @@ func on_item_activated():
 	
 	var parent_text = parent.get_text(0)
 	var text = item.get_text(0)
+	var metadata = item.get_metadata(0)
 	
 	# Ignore categories
 	if text == "Objects" or text == "Textures":
@@ -36,31 +37,26 @@ func on_item_activated():
 	
 	# TODO: Clean up!!
 	if parent_text == "Objects":
-		var index = 0
-		for obj_def in model.obj_defs:
-			if text == obj_def.name:
-				index = obj_def.index
-				break
-		
+		var index = metadata['id']
 		model_item = model.rom_objs[index]
 	elif parent_text == "Textures":
-		var index = 0
-		for tex_def in model.tex_defs:
-			if text == tex_def.name:
-				index = tex_def.index
-				break
+		var index = metadata['id']
+		
 		model_item = model.rom_texs[index]
 		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
 		image_viewer.texture = imgTex
 	elif parent_text == "Object Textures":
-		var index = 0
-		for obj_def in model.obj_defs:
-			if text == obj_def.name:
-				index = obj_def.index
-				break
+		var index = metadata['id']
+		var sub_obj = metadata['sub_id']
+		
 		# Small extra step!
 		var obj = model.rom_objs[index]
-		index = obj.sub_obj_0_tex_index
+		
+		if sub_obj == -1:
+			index = obj.sub_obj_0_tex_index
+		else:
+			index = obj.sub_obj_data[sub_obj]['tex_index']
+		# End If
 		# Okay back to normal stuff
 		model_item = model.rom_texs[index]
 		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])

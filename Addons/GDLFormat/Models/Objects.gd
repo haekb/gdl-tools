@@ -143,6 +143,8 @@ class Objects:
 		var id_number = 0
 		var obj_def = 0
 		
+		var sub_obj_data = []
+		
 		func read(Obj : Objects, f : File):
 			self.inv_rad = f.get_float()
 			self.bnd_rad = f.get_float()
@@ -164,6 +166,24 @@ class Objects:
 			
 			# Skip past 4 ints
 			var _dummy = Array(f.get_buffer(4 * 4))
+			
+			# Read in sub obj data (Over 1, since the count includes the main obj!)
+			if self.sub_obj_count > 1:
+				var last_spot = f.get_position()
+				f.seek(self.sub_obj_pointer)
+				
+				for _i in range(self.sub_obj_count - 1):
+					self.sub_obj_data.append({
+						'qwc': f.get_16(),
+						'tex_index': f.get_16(),
+						'lm_index': f.get_16(),
+						'lodk': f.get_16(),
+					})
+				# End For
+				
+				f.seek(last_spot)
+			# End If
+			
 		# End Func
 	# End Class
 	

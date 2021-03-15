@@ -21,6 +21,7 @@ func object_loader(path):
 			continue
 		var item = file_list.create_item(objs)
 		item.set_text(0, obj_def.name)
+		item.set_metadata(0, {'id': obj_def.index})
 	# End For
 	
 	var texs = file_list.create_item(root)
@@ -32,6 +33,7 @@ func object_loader(path):
 			continue
 		var item = file_list.create_item(texs)
 		item.set_text(0, tex_def.name)
+		item.set_metadata(0, {'id': tex_def.index})
 	# End For
 	
 	var model_texs = file_list.create_item(root)
@@ -44,6 +46,16 @@ func object_loader(path):
 			continue
 		var item = file_list.create_item(model_texs)
 		item.set_text(0, "%s" % obj_def.name)
+		item.set_metadata(0, {'id': obj_def.index, 'sub_id': -1})
+		
+		var rom_obj = obj_model.rom_objs[obj_def.index]
+		
+		if rom_obj.sub_obj_count > 1:
+			for i in range(len(rom_obj.sub_obj_data)):
+				item = file_list.create_item(model_texs)
+				item.set_text(0, "%s (SubObj %d)" % [obj_def.name, i+1])
+				item.set_metadata(0, {'id': obj_def.index, 'sub_id': i})
+		
 	# End For
 	
 # End Func

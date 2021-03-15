@@ -64,10 +64,6 @@ class Texture_IDX_8_ABGR_8888:
 		
 		palette = process_palette(palette)
 		
-		var palette_img = Image.new()
-		palette_img.create_from_data(64, 4, false, Image.FORMAT_RGBA8, palette)
-		palette_img.save_png("./palette.png")
-		
 		pos = palette_size
 		while pos < data_len:
 			var index = data[pos]

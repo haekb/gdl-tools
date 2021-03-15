@@ -59,10 +59,15 @@ class Textures:
 		# Include the palette
 		if format == Constants.Tex_Formats.IDX_8_ABGR_8888:
 			read += 1024
+		elif format == Constants.Tex_Formats.IDX_8_ABGR_1555:
+			read += 512
 			
 		if format == Constants.Tex_Formats.ABGR_1555:
 			# Two bytes per pixel
 			read *= 2
+		#if format == Constants.Tex_Formats.IDX_8_ABGR_1555:
+		#	# Two bytes per pixel
+		#	read *= 2
 		
 		if !f.endian_swap:
 			tex_data = Array(f.get_buffer(read))
