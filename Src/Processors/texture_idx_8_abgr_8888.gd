@@ -88,11 +88,6 @@ class Texture_IDX_8_ABGR_8888:
 			
 			pos += 1
 		# End While
-		
-		# Debug
-		var img = Image.new()
-		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
-		img.save_png("./texture_idx_8_abgr_8888.png")
 
 		return image_data
 	# End Func

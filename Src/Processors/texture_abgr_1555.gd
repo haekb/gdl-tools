@@ -45,11 +45,6 @@ class Texture_ABGR_1555:
 			y += 1
 		# End While
 
-		# Debug
-#		var img = Image.new()
-#		img.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)
-#		img.save_png("./texture_abgr_1555.png")
-
 		return image_data
 	# End Func
 # End Class

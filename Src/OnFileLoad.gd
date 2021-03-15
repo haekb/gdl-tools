@@ -33,6 +33,19 @@ func object_loader(path):
 		var item = file_list.create_item(texs)
 		item.set_text(0, tex_def.name)
 	# End For
+	
+	var model_texs = file_list.create_item(root)
+	model_texs.set_text(0, "Object Textures")
+	
+	# Append the model textures
+	for obj_def in obj_model.obj_defs:
+		# Ignore empty entries
+		if obj_def.name == "":
+			continue
+		var item = file_list.create_item(model_texs)
+		item.set_text(0, "%s" % obj_def.name)
+	# End For
+	
 # End Func
 
 # Bootstraps the application

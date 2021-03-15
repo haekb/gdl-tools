@@ -34,6 +34,7 @@ func on_item_activated():
 	var file_path = ui_controller.loaded_path
 	var extension = ui_controller.loaded_extension
 	
+	# TODO: Clean up!!
 	if parent_text == "Objects":
 		var index = 0
 		for obj_def in model.obj_defs:
@@ -51,7 +52,19 @@ func on_item_activated():
 		model_item = model.rom_texs[index]
 		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
 		image_viewer.texture = imgTex
-	
+	elif parent_text == "Object Textures":
+		var index = 0
+		for obj_def in model.obj_defs:
+			if text == obj_def.name:
+				index = obj_def.index
+				break
+		# Small extra step!
+		var obj = model.rom_objs[index]
+		index = obj.sub_obj_0_tex_index
+		# Okay back to normal stuff
+		model_item = model.rom_texs[index]
+		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
+		image_viewer.texture = imgTex
 	
 	pass
 
