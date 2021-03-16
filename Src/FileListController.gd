@@ -18,6 +18,8 @@ func _ready():
 	
 	pass # Replace with function body.
 
+
+
 func on_item_activated():
 	var item = self.get_selected()
 	var parent = item.get_parent()
@@ -71,7 +73,7 @@ func on_item_activated():
 				print("Texture Index: %d" % tex_index)
 				
 				var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model.rom_texs[tex_index], [])
-				imgTex.get_data().save_png("%s.png" % mesh_instance.name)
+				#imgTex.get_data().save_png("%s.png" % mesh_instance.name)
 				
 				var mat = SpatialMaterial.new()
 				mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
@@ -81,15 +83,15 @@ func on_item_activated():
 				
 				mesh_viewer.add_child(mesh_instance)
 				
-			self.image_viewer.visible = false
+			self.image_viewer.get_parent().visible = false
 		
 	elif parent_text == "Textures":
 		var index = metadata['id']
 		
 		model_item = model.rom_texs[index]
-		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
+		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, ['no_filter'])
 		
-		self.image_viewer.visible = true
+		self.image_viewer.get_parent().visible = true
 		self.image_viewer.texture = imgTex
 	elif parent_text == "Object Textures":
 		var index = metadata['id']
@@ -105,9 +107,9 @@ func on_item_activated():
 		# End If
 		# Okay back to normal stuff
 		model_item = model.rom_texs[index]
-		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, [])
+		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, ['no_filter'])
 		
-		self.image_viewer.visible = true
+		self.image_viewer.get_parent().visible = true
 		self.image_viewer.texture = imgTex
 	
 	pass

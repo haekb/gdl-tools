@@ -20,19 +20,40 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 	var p1 = 0
 	var p2 = 1
 	
-	var flip = false
+	var flip = true
 	
 	for p3 in range(2, len(obj_vertices)):
+		# https://gamedev.stackexchange.com/questions/159379/getting-the-winding-order-of-a-mesh
+		var vertex = obj_vertices[p3].vector
+		var a = obj_vertices[p1].vector
+		var b = obj_vertices[p2].vector
+		var c = obj_vertices[p3].vector
+		
+		var vec_1 = b - a
+		var vec_2 = c - b
+		
+		
+		var expected_normal = vec_1.cross(vec_2);
+		
+		var n1 = obj_skip_vertices[p1].normal
+		var n2 = obj_skip_vertices[p2].normal
+		var n3 = obj_skip_vertices[p3].normal
+		var an = n1 + n2 + n3 / 3  
+		
+		var order = expected_normal.dot(an)
+		
 		if !obj_skip_vertices[p3].skip:
-			if flip:
-				indexes.append([p1, p3, p2])
-			else:
-				indexes.append([p1, p2, p3])
-			# End If
-			
-			#flip = not flip
-		#else:
-		#	flip = false
+			if order > 0:
+				indexes.append([p2, p1, p3])
+			else: #elif order < 0:
+				indexes.append([p3, p1, p2])
+#			if flip:
+#				indexes.append([p1, p3, p2])
+#			else:
+#				indexes.append([p1, p2, p3])
+#			# End If
+#
+#			flip = not flip
 		# End If
 		
 		# Carry over!
@@ -49,19 +70,6 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 		vertices.append(vertex)
 	# End For
 	
-#	for vi in range(len(vertices)):
-#		var vertex = vertices[vi]
-#		var index = indexes[vi]
-#		var uv = uvs[vi]
-#
-#		st.add_index(index[0])
-#		st.add_index(index[1])
-#		st.add_index(index[2])
-#
-#		st.add_uv(uv)
-#		st.add_vertex(vertex)
-#	# End For
-
 	for i in range(len(indexes)):
 		var index = indexes[i]
 		for vi in index:
@@ -70,29 +78,13 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 	# End For
 	
 	for i in range(len(vertices)):
-		
-		#for y in 3:
-		#	st.add_uv(obj_uvs[i].uv)
-		
 		st.add_uv(obj_uvs[i].uv)
 		st.add_normal(obj_skip_vertices[i].normal)
 		st.add_vertex(vertices[i])
-		
-		#var vertex = vertices[vi]
-#		var index = indexes[i]
-#		var uv = obj_uvs[i].uv
-#
-#		var verts = []
-#
-#
-#		for vi in index:
-#			st.add_uv(uv)
-#			st.add_vertex(vertices[vi])
-#		# End For
 	# End For
 	
-	#st.generate_normals()
-	st.generate_tangents()
+	st.generate_normals(true)
+	#st.generate_tangents()
 	
 	var mesh_array = st.commit()
 	

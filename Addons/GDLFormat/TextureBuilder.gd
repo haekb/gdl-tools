@@ -34,6 +34,8 @@ func build(source_file, rom_tex, options):
 		
 	var texture = ImageTexture.new()
 	texture.create_from_image(model.image)
-	texture.set_flags(0)
+	
+	if 'no_filter' in options:
+		texture.set_flags(0)
 	
 	return texture

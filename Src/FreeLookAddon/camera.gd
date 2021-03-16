@@ -91,6 +91,8 @@ func _input(event):
 				_q = event.pressed
 			if action == "move_down":
 				_e = event.pressed
+				
+		get_tree().set_input_as_handled()
 #		match event.scancode:
 #			KEY_W:
 #				_w = event.pressed
