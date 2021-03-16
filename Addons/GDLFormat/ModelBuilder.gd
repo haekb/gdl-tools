@@ -8,10 +8,12 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 	var obj_vertices = obj_data.vertices[sub_obj_index]
 	var obj_uvs = obj_data.uvs[sub_obj_index]
 	var obj_skip_vertices = obj_data.skip_vertices[sub_obj_index]
+	var obj_unk_vec2 = obj_data.unk_vec2[sub_obj_index]
 	
 	var vertices = []
 	var uvs = []
 	var indexes = []
+	var normals = []
 	
 	var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
 	print("Object Flags: ", flags)
@@ -21,39 +23,20 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 	var p2 = 1
 	
 	var flip = true
-	
+
 	for p3 in range(2, len(obj_vertices)):
-		# https://gamedev.stackexchange.com/questions/159379/getting-the-winding-order-of-a-mesh
-		var vertex = obj_vertices[p3].vector
-		var a = obj_vertices[p1].vector
-		var b = obj_vertices[p2].vector
-		var c = obj_vertices[p3].vector
-		
-		var vec_1 = b - a
-		var vec_2 = c - b
-		
-		
-		var expected_normal = vec_1.cross(vec_2);
-		
-		var n1 = obj_skip_vertices[p1].normal
-		var n2 = obj_skip_vertices[p2].normal
-		var n3 = obj_skip_vertices[p3].normal
-		var an = n1 + n2 + n3 / 3  
-		
-		var order = expected_normal.dot(an)
-		
 		if !obj_skip_vertices[p3].skip:
-			if order > 0:
-				indexes.append([p2, p1, p3])
-			else: #elif order < 0:
-				indexes.append([p3, p1, p2])
-#			if flip:
-#				indexes.append([p1, p3, p2])
-#			else:
-#				indexes.append([p1, p2, p3])
-#			# End If
-#
-#			flip = not flip
+			if flip:
+				indexes.append([p1, p3, p2])
+			else:
+				indexes.append([p1, p2, p3])
+			# End If
+
+			
+			flip = not flip
+			print("Flip %d" % int(flip))
+		else:
+			print("^ SKIP VERT!")
 		# End If
 		
 		# Carry over!
@@ -83,8 +66,8 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 		st.add_vertex(vertices[i])
 	# End For
 	
-	st.generate_normals(true)
-	#st.generate_tangents()
+	# Clean up normals
+	st.generate_normals()
 	
 	var mesh_array = st.commit()
 	

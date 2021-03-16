@@ -285,7 +285,6 @@ class Objects:
 		
 		const SIGNAL_MODE_UNK_5BYTE = 0x6F # V4-5 - 4 Items packed in 5 bytes
 		const SIGNAL_MODE_UNK_8BYTE = 0x6D # V4-16 (4 items, 16 bytes) # Possibly level-based
-		const SIGNAL_MODE_UNK_2BYTE = 0x66 # V2-8 (2 items, 8 bytes)
 		# Confirmed
 		const SIGNAL_MODE_HEADER = 0x6C # V4-32 (4 items, 32 bytes) (Doesn't quite line up..)
 		# Vertex
@@ -474,6 +473,8 @@ class Objects:
 				# If there is, mark it as merge with previous then grab that mesh data.
 				while total_size < unpack_size:
 					
+					var unk_vec2 = Vector2()
+					
 					while true:
 						Helpers.align(4, f)
 						
@@ -483,13 +484,16 @@ class Objects:
 						if ps2_signal.is_header():
 							f.seek((4 * 2) + f.get_position())
 							
-							obj_unk_vec2.append(Vector2( f.get_float(), f.get_float() ))
+							
+							unk_vec2 = (Vector2( f.get_float(), f.get_float() ))
 						elif ps2_signal.is_vertex():
 							for _i in range(ps2_signal.data_count - 1):
 								var debug_pos = f.get_position()
 								var vertex = Vertex.new()
 								vertex.read(ps2_signal.mode, f)
 								obj_vertices.append(vertex)
+								# Keep it even with vertex count
+								obj_unk_vec2.append(unk_vec2)
 							# End For
 							
 							# Skip over data padding

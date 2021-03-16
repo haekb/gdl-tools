@@ -79,6 +79,10 @@ func on_item_activated():
 				mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
 				mat.metallic_specular = 0.0
 				
+				# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
+				# So let's just render both sides...
+				mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
+				
 				mesh_instance.set_surface_material(0, mat)
 				
 				mesh_viewer.add_child(mesh_instance)
