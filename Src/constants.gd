@@ -62,3 +62,5 @@ enum Model_Flags {
 	DYN_LIGHT = 1048576,
 	END = 1048577,
 }
+
+const Normal_Scale = 0.06666667

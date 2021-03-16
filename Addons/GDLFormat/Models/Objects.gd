@@ -303,11 +303,20 @@ class Objects:
 			
 			func read(mode, f : File):
 				if mode == SIGNAL_MODE_CHAR_3:
-					self.vector = Vector3( Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()) )
+					var x = Helpers.utsb(f.get_8())
+					var y = Helpers.utsb(f.get_8())
+					var z = Helpers.utsb(f.get_8())
+					self.vector = Vector3( float(x), float(y), float(z) )
 				elif mode == SIGNAL_MODE_SHORT_3:
-					self.vector = Vector3( Helpers.utsh(f.get_16()), Helpers.utsh(f.get_16()), Helpers.utsh(f.get_16()) )
+					var x = Helpers.utsh(f.get_16())
+					var y = Helpers.utsh(f.get_16())
+					var z = Helpers.utsh(f.get_16())
+					self.vector = Vector3( float(x), float(y), float(z) )
 				else: # Unknown!
-					self.vector = Vector3( Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()), Helpers.utsb(f.get_8()) )
+					var x = Helpers.utsb(f.get_8())
+					var y = Helpers.utsb(f.get_8())
+					var z = Helpers.utsb(f.get_8())
+					self.vector = Vector3( float(x), float(y), float(z) )
 				# End If
 			# End Func
 		# End Class
@@ -318,18 +327,19 @@ class Objects:
 			func read(mode, f : File):
 				# Divided by max value of the type
 				if mode == SIGNAL_MODE_CHAR_2:
-					var u = Helpers.utsb(f.get_8())
-					var v = Helpers.utsb(f.get_8())
-					self.uv = Vector2( float( u ) / 128.0, float( v ) / 128.0 )
+					var u = float(Helpers.utsb(f.get_8())) / 128.0
+					var v = float(Helpers.utsb(f.get_8())) / 128.0
+					self.uv = Vector2( u, v )
 				elif mode == SIGNAL_MODE_SHORT_2:
-					var u = Helpers.utsh(f.get_16())
-					var v = Helpers.utsh(f.get_16())
-					self.uv = Vector2( float( u) / 32768.0, float( v ) / 32768.0 )
+					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					self.uv = Vector2( u, v )
 				else:
-					var u = Helpers.utsb(f.get_8())
-					var v = Helpers.utsb(f.get_8())
-					self.uv = Vector2( float( u ) / 128.0, float( v ) / 128.0 )
+					var u = float(Helpers.utsb(f.get_8())) / 128.0
+					var v = float(Helpers.utsb(f.get_8())) / 128.0
+					self.uv = Vector2( u, v )
 				# End If
+				var hello = true
 			# End Func
 		# End Class
 		
@@ -337,12 +347,22 @@ class Objects:
 			var byte_1 = 0
 			var byte_2 = 0
 			var skip = false
+			var normal = Vector3()
 			
 			func read(f : File):
 				# Still unsure how this all works, but it does work!
 				self.byte_1 = f.get_8()
 				self.byte_2 = f.get_8()
-				self.skip = bool( self.byte_2 >> 7 )
+				self.skip = bool( (self.byte_2 >> 7) )
+				
+				# Roll back and let's calculate normals!
+				f.seek(f.get_position() - 2)
+				var packed_normal = f.get_16()
+				var x = ((packed_normal & 0x1f) - 0xf) * Constants.Normal_Scale
+				var y = (((packed_normal >> 5) & 0xf) - 0xf) * Constants.Normal_Scale
+				var z = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
+				self.normal = Vector3(x,y,z)
+				
 			# End Func
 		# End Class
 		
@@ -509,13 +529,21 @@ class Objects:
 					
 					current_position = f.get_position()
 					total_size = current_position - last_position
+					
 				# End While
 				Helpers.align(16, f)
+				
+				# Push the subobj into the main data array
+				self.vertices.append(obj_vertices)
+				self.uvs.append(obj_uvs)
+				self.skip_vertices.append(obj_skip_vertices)
+				self.unk_vec2.append(obj_unk_vec2)
+				
 			# End While
-			self.vertices = obj_vertices
-			self.uvs = obj_uvs
-			self.skip_vertices = obj_skip_vertices
-			self.unk_vec2 = obj_unk_vec2
+#			self.vertices = obj_vertices
+#			self.uvs = obj_uvs
+#			self.skip_vertices = obj_skip_vertices
+#			self.unk_vec2 = obj_unk_vec2
 		# End Func
 		
 	# End Class
