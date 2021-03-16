@@ -443,15 +443,15 @@ class Objects:
 			# This includes the main mesh
 			var obj_count = rom_obj.sub_obj_count
 			
-			var obj_vertices = []
-			var obj_uvs = []
-			var obj_skip_vertices = []
-			var obj_unk_vec2 = []
-			
 			var last_position = 0
 			while obj_count > 0:
 				obj_count -= 1
 				
+				var obj_vertices = []
+				var obj_uvs = []
+				var obj_skip_vertices = []
+				var obj_unk_vec2 = []
+					
 				last_position = f.get_position()
 				var unpack_command = f.get_32()
 				
