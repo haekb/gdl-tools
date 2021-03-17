@@ -79,6 +79,12 @@ func utsh(value):
 		return value - 65536
 
 	return value
+	
+func utsi(value):
+	if value > 2147483647:
+		return value - 4294967296
+	
+	return value
 
 func read_c_string(f : File):
 	var string = ""

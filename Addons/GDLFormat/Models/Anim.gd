@@ -16,6 +16,7 @@ class Anim:
 	var current_skeleton = null
 	
 	# Processed data
+	var skeletons = []
 	
 	func read(f : File):
 		self.skeleton_count = f.get_16()
@@ -39,6 +40,7 @@ class Anim:
 		for skeleton in self.skeletons:
 			skeleton.read_data(self, f)
 		# End For
+		return Helpers.make_response(Helpers.IMPORT_RETURN.SUCCESS)
 	# End Func
 	
 	func anim_seek(pointer, f : File):
@@ -106,19 +108,19 @@ class Anim:
 			_anim.skel_seek(self.data_pointer, f)
 			
 			self.animation_data = _anim.AnimData.new()
-			self.animation_data.read(f)
+			self.animation_data.read(_anim, f)
 			
 			_anim.skel_seek(self.header_pointer, f)
 			for _i in range(self.animation_count):
 				var header = _anim.AnimHeader.new()
-				header.read(f)
+				header.read(_anim, f)
 				self.animation_headers.append(header)
 			# End For
 			
 			_anim.skel_seek(self.bone_pointer, f)
 			for bi in range(self.bone_count):
 				var bone = _anim.SkelBone.new()
-				bone.read(f)
+				bone.read(_anim, f)
 				self.bones.append(bone)
 				
 				var bone_position = f.get_position() 
@@ -166,10 +168,10 @@ class Anim:
 			
 			self.location = Helpers.read_vector3(f)
 			self.type = f.get_16()
-			self.flags = f.get_32()
+			self.flags = f.get_16()
 			self.mb_flags = f.get_32()
 			self.sequence_pointer = f.get_32()
-			self.parent_id = f.get_32()
+			self.parent_id = Helpers.utsi(f.get_32())
 			
 			# Setup a default bind pose
 			self.bind_matrix = Basis(self.location)
@@ -264,11 +266,11 @@ class Anim:
 			var debug_ftell = f.get_position()
 			
 			# Decompiled code, uhhh...yea it's interesting
-			var jump_spot = (_anim.current_skeleton[index].frame_count + 0x1f >> 5) * 4
+			var jump_spot = (_anim.current_skeleton.animation_headers[index].frame_count + 0x1f >> 5) * 4
 			
 			f.seek( jump_spot )
 			
-			var total_size = self.size + _anim.current_skeleton[index].frame_count
+			var total_size = self.size + _anim.current_skeleton.animation_headers[index].frame_count
 			
 			for _i in range( total_size ):
 				self.data.append( f.get_float() )

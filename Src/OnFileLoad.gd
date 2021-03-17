@@ -1,8 +1,24 @@
 extends Node
 
+onready var ui_controller = get_node("../../")
 onready var file_list = get_node("../../Container/FileList") as Tree
+onready var anim_builder = load('res://Addons/GDLFormat/AnimBuilder.gd').new()
 
 var loaded_model = null
+var loaded_anim_model = null
+
+func anim_loader(root : TreeItem):
+	var file_path = ui_controller.loaded_path
+	var extension = ui_controller.loaded_extension
+	var anim = self.anim_builder.build("%s/anim.%s" % [file_path, extension], [])
+	self.loaded_anim_model = anim
+	
+	for skeleton in anim.skeletons:
+		var skel = file_list.create_item(root)
+		skel.set_text(0, skeleton.name)
+	# End For
+# End Func
+
 
 func object_loader(path):
 	var obj_builder = load('res://Addons/GDLFormat/ObjectBuilder.gd').new()
@@ -15,7 +31,7 @@ func object_loader(path):
 	var anims = file_list.create_item(root)
 	anims.set_text(0, "Anims")
 	
-	# TODO: Add anims
+	anim_loader(anims)
 	
 	var objs = file_list.create_item(root)
 	objs.set_text(0, "Objects")
