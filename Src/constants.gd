@@ -63,4 +63,13 @@ enum Model_Flags {
 	END = 1048577,
 }
 
+enum Bone_Types {
+	EMPTY = 0xFFFFFFFF,
+	NULL = 0,
+	SKEL_ANIM = 1
+	OBJ_ANIM = 2
+	TEX_ANIM = 3
+	PSYS_ANIM = 4
+}
+
 const Normal_Scale = 0.06666667

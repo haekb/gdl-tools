@@ -79,3 +79,25 @@ func utsh(value):
 		return value - 65536
 
 	return value
+
+func read_c_string(f : File):
+	var string = ""
+	while true:
+		var next_value = f.get_8()
+		if next_value == 0x0:
+			break
+		string += char(next_value)
+	# End While
+	return string
+# End Func
+
+func read_vector3(f : File):
+	var x = f.get_float()
+	var y = f.get_float()
+	var z = f.get_float()
+	return Vector3(x, y, z)
+
+# Equiv of f.seek(amount, 1) in python
+func seek_ahead(amount, f : File):
+	f.seek(f.get_position() + amount)
+# End If

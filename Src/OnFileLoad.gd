@@ -12,6 +12,11 @@ func object_loader(path):
 	var root = file_list.create_item()
 	root.set_text(0, "%s" % path.get_file())
 	
+	var anims = file_list.create_item(root)
+	anims.set_text(0, "Anims")
+	
+	# TODO: Add anims
+	
 	var objs = file_list.create_item(root)
 	objs.set_text(0, "Objects")
 	
