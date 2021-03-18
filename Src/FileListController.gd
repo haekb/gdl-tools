@@ -15,8 +15,17 @@ func _ready():
 	assert(mesh_viewer)
 	
 	self.connect("item_activated", self, "on_item_activated")
+	self.connect("mouse_entered", self, "on_mouse_entered")
+	self.connect("mouse_exited", self, "on_mouse_leave")
 	
 	pass # Replace with function body.
+
+func on_mouse_entered():
+	GlobalSignals.emit_signal("OnMouseEnterFileList")
+# End Func
+
+func on_mouse_leave():
+	GlobalSignals.emit_signal("OnMouseLeaveFileList")
 
 func load_mesh(model, index):
 	var file_path = ui_controller.loaded_path

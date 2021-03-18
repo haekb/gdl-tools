@@ -21,6 +21,8 @@ var _d = false
 var _q = false
 var _e = false
 
+var controls_enabled = true
+
 # Default bindings
 var bindings = {
 	KEY_W : "move_forwards",
@@ -56,8 +58,19 @@ func read_keys_from_config():
 
 func _init():
 	self.read_keys_from_config()
+	GlobalSignals.connect("OnMouseLeaveFileList", self, "on_mouse_activate")
+	GlobalSignals.connect("OnMouseEnterFileList", self, "on_mouse_deactivate")
+	
+func on_mouse_activate():
+	controls_enabled = true
+	
+func on_mouse_deactivate():
+	controls_enabled = false
 
 func _input(event):
+	if !controls_enabled:
+		return
+	
 	# Receives mouse motion
 	if event is InputEventMouseMotion:
 		_mouse_position = event.relative
@@ -109,6 +122,9 @@ func _input(event):
 
 # Updates mouselook and movement every frame
 func _process(delta):
+	if !controls_enabled:
+		return
+	
 	_update_mouselook()
 	_update_movement(delta)
 
