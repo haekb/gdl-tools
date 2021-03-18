@@ -155,6 +155,7 @@ class Anim:
 		var parent_id = -1
 		
 		# Linkage
+		var id = -1
 		var parent = null
 		var children = []
 		var child_count = 0

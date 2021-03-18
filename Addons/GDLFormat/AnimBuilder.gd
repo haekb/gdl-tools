@@ -17,13 +17,15 @@ func build(source_file, options):
 	
 	file.close()
 	
+	setup_skeleton(model)
+	
 	if response.code == Helpers.IMPORT_RETURN.ERROR:
 		print("IMPORT ERROR: %s" % response.message)
 		return null
 		
 	return model
 
-func build_skeleton(anim):
+func setup_skeleton(anim):
 	
 	# Need a bit of setup first
 	
@@ -50,7 +52,24 @@ func build_skeleton(anim):
 			# End For
 		# End For
 	# End For
-	
-	# Okay build the skeleton!
-	
 # End Func
+
+func build_skeleton(anim, index):
+	var skeleton = anim.skeletons[index]
+	
+	var godot_skeleton = Skeleton.new()
+	
+	for bone in skeleton.data.bones:
+		godot_skeleton.add_bone(bone.name)
+		var bi = godot_skeleton.get_bone_count() - 1
+		
+		bone.id = bi
+		
+		if bone.parent != null:
+			godot_skeleton.set_bone_parent(bi, bone.parent_id)
+		# End If
+		
+		godot_skeleton.set_bone_rest(bi, bone.bind_matrix)
+	# End For
+	
+	return godot_skeleton

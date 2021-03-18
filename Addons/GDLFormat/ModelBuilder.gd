@@ -1,6 +1,6 @@
 extends Node
 
-func build(name, rom_obj, obj_data, sub_obj_index, options):
+func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	print("Building %s" % name)
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -34,9 +34,10 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 
 			
 			flip = not flip
-			print("Flip %d" % int(flip))
+			#print("Flip %d" % int(flip))
 		else:
-			print("^ SKIP VERT!")
+			pass
+			#print("^ SKIP VERT!")
 		# End If
 		
 		# Carry over!
@@ -49,6 +50,11 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 		
 		# Scale it down a bit...
 		vertex *= 0.008
+		#vertex *= 0.003
+		
+		# Switch from model space to skeleton space (which sounds real cool.)
+		#if bone:
+		#	vertex = bone.bind_matrix * vertex
 		
 		vertices.append(vertex)
 	# End For
@@ -61,6 +67,10 @@ func build(name, rom_obj, obj_data, sub_obj_index, options):
 	# End For
 	
 	for i in range(len(vertices)):
+		if bone:
+			st.add_weights([1.0, 0.0, 0.0, 0.0])
+			st.add_bones([bone.id, 0, 0, 0])
+		
 		st.add_uv(obj_uvs[i].uv)
 		st.add_normal(obj_skip_vertices[i].normal)
 		st.add_vertex(vertices[i])

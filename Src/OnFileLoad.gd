@@ -13,9 +13,11 @@ func anim_loader(root : TreeItem):
 	var anim = self.anim_builder.build("%s/anim.%s" % [file_path, extension], [])
 	self.loaded_anim_model = anim
 	
-	for skeleton in anim.skeletons:
+	for i in range(len(anim.skeletons)):
+		var skeleton = anim.skeletons[i]
 		var skel = file_list.create_item(root)
 		skel.set_text(0, skeleton.name)
+		skel.set_metadata(0, {'id': i})
 	# End For
 # End Func
 
@@ -97,5 +99,5 @@ func on_file_load(path : String):
 		self.object_loader(path.to_lower())
 	# End If
 	
-	return self.loaded_model
+	return [self.loaded_model, self.loaded_anim_model]
 # End Func
