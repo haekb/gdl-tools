@@ -175,7 +175,7 @@ class Anim:
 			self.parent_id = Helpers.utsi(f.get_32())
 			
 			# Setup a default bind pose
-			self.bind_matrix = Basis(self.location)
+			self.bind_matrix = Transform(Basis(), self.location)
 		# End Func
 		
 	class AnimData:

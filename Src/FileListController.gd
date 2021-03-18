@@ -37,6 +37,10 @@ func load_anim(anim_model, obj_model, index):
 	var skeleton = self.anim_builder.build_skeleton(anim_model, index)
 	
 	var anim_root = Spatial.new()
+	anim_root.name = "AnimRoot"
+	
+	anim_root.add_child(skeleton)
+	skeleton.owner = anim_root
 	
 	var model_indexes = {}
 	var model_meshes = {}
@@ -53,16 +57,24 @@ func load_anim(anim_model, obj_model, index):
 				model_meshes[bone.name] = load_mesh(obj_model, i, bone)
 				
 				for mesh in model_meshes[bone.name]:
-					mesh.owner = skeleton
 					skeleton.add_child(mesh)
-						
+					mesh.owner = anim_root
 				break
 			# End If
 		# End For
 	# End For
 	
+	var anim_player = AnimationPlayer.new()
+	anim_player.name = "AnimPlayer"
+	anim_player = self.anim_builder.process_animations(anim_model, index, skeleton, anim_player)
 	
-	anim_root.add_child(skeleton)
+
+	
+
+	anim_root.add_child(anim_player)
+	anim_player.owner = anim_root
+	
+	anim_player.play("Default")
 	
 	return anim_root
 
@@ -166,7 +178,9 @@ func on_item_activated():
 			
 			var mesh_instances = load_mesh(model, index)
 			for mesh_instance in mesh_instances:
+
 				mesh_viewer.add_child(mesh_instance)
+				mesh_instance.owner = mesh_viewer
 				
 			self.image_viewer.get_parent().visible = false
 		
@@ -189,7 +203,12 @@ func on_item_activated():
 		var index = metadata['id']
 		
 		var skel = load_anim(anim_model, model, index)
+		skel.owner = mesh_viewer
 		mesh_viewer.add_child(skel)
+		
+		var scene = PackedScene.new()
+		scene.pack(skel)
+		ResourceSaver.save("res://my_scene.tscn", scene)
 		
 		self.image_viewer.get_parent().visible = false
 	

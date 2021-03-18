@@ -47,8 +47,8 @@ func setup_skeleton(anim):
 				continue
 			# End If
 	
-			for child_bone in bone.children:
-				child_bone.bind_matrix = bone.bind_matrix * child_bone.bind_matrix
+			#for child_bone in bone.children:
+			#	child_bone.bind_matrix = bone.bind_matrix.inverse() * child_bone.bind_matrix
 			# End For
 		# End For
 	# End For
@@ -58,6 +58,7 @@ func build_skeleton(anim, index):
 	var skeleton = anim.skeletons[index]
 	
 	var godot_skeleton = Skeleton.new()
+	godot_skeleton.name = "Skeleton"
 	
 	for bone in skeleton.data.bones:
 		godot_skeleton.add_bone(bone.name)
@@ -70,6 +71,31 @@ func build_skeleton(anim, index):
 		# End If
 		
 		godot_skeleton.set_bone_rest(bi, bone.bind_matrix)
+		godot_skeleton.set_bone_pose(bi, bone.bind_matrix)
 	# End For
 	
 	return godot_skeleton
+
+func process_animations(model, index, godot_skeleton : Skeleton, anim_player : AnimationPlayer):
+	var anim = Animation.new()
+	var skeleton = model.skeletons[index]
+	
+	# Pre-make our track ids
+	for bi in range(len(skeleton.data.bones)):
+		var bone = skeleton.data.bones[bi]
+		
+		var key = "Skeleton:%s" % bone.name
+		var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
+		anim.track_set_path(track_id, key)
+		
+		var matrix = godot_skeleton.get_bone_rest(bi)
+		var translation = matrix.origin 
+		var rotation  = matrix.basis.get_rotation_quat()
+		
+		anim.transform_track_insert_key(bi, 0, translation, rotation, Vector3(1.0, 1.0, 1.0))
+	# End For
+	
+	anim.loop = true
+	anim_player.add_animation("Default", anim)
+	
+	return anim_player
