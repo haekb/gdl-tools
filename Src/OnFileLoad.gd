@@ -1,7 +1,7 @@
 extends Node
 
 onready var ui_controller = get_node("../../")
-onready var file_list = get_node("../../Container/FileList") as Tree
+onready var file_list = get_node("../../SplitContainer/FileList") as Tree
 onready var anim_builder = load('res://Addons/GDLFormat/AnimBuilder.gd').new()
 
 var loaded_model = null

@@ -19,6 +19,11 @@ config/icon="res://icon.png"
 Constants="*res://Src/constants.gd"
 Helpers="*res://Src/helpers.gd"
 
+[display]
+
+window/size/width=1280
+window/size/height=720
+
 [physics]
 
 common/enable_pause_aware_picking=true

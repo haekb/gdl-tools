@@ -18,7 +18,46 @@ func _ready():
 	
 	pass # Replace with function body.
 
-
+func load_mesh(model, index):
+	var file_path = ui_controller.loaded_path
+	var extension = ui_controller.loaded_extension
+	var model_item = model.rom_objs[index]
+	var obj_data = model.obj_data[index]
+	var obj_def = model.obj_defs[index]
+	
+	var meshes = []
+	
+	print("Generating %d meshes..." % len(obj_data.vertices))
+	for i in range(len(obj_data.vertices)):
+		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, [])
+		var mesh_instance = MeshInstance.new()
+		
+		mesh_instance.name = "%s - %d" % [obj_def.name, i]
+		mesh_instance.mesh = mesh_array
+		
+		var tex_index = model_item.sub_obj_0_tex_index
+		if i > 0:
+			tex_index = model_item.sub_obj_data[i - 1]['tex_index']
+		# End If
+		
+		print("Texture Index: %d" % tex_index)
+		
+		var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model.rom_texs[tex_index], [])
+		#imgTex.get_data().save_png("%s.png" % mesh_instance.name)
+		
+		var mat = SpatialMaterial.new()
+		mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
+		mat.metallic_specular = 0.0
+		
+		# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
+		# So let's just render both sides...
+		mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
+		
+		mesh_instance.set_surface_material(0, mat)
+		meshes.append(mesh_instance)
+	
+	return meshes
+# End Func
 
 func on_item_activated():
 	var item = self.get_selected()
@@ -57,34 +96,9 @@ func on_item_activated():
 		var obj_def = model.obj_defs[index]
 		
 		if obj_data != null:
-			print("Generating %d meshes..." % len(obj_data.vertices))
-			for i in range(len(obj_data.vertices)):
-				var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, [])
-				var mesh_instance = MeshInstance.new()
-				
-				mesh_instance.name = "%s - %d" % [obj_def.name, i]
-				mesh_instance.mesh = mesh_array
-				
-				var tex_index = model_item.sub_obj_0_tex_index
-				if i > 0:
-					tex_index = model_item.sub_obj_data[i - 1]['tex_index']
-				# End If
-				
-				print("Texture Index: %d" % tex_index)
-				
-				var imgTex = self.texture_builder.build("%s/textures.%s" % [file_path, extension], model.rom_texs[tex_index], [])
-				#imgTex.get_data().save_png("%s.png" % mesh_instance.name)
-				
-				var mat = SpatialMaterial.new()
-				mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
-				mat.metallic_specular = 0.0
-				
-				# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
-				# So let's just render both sides...
-				mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
-				
-				mesh_instance.set_surface_material(0, mat)
-				
+			
+			var mesh_instances = load_mesh(model, index)
+			for mesh_instance in mesh_instances:
 				mesh_viewer.add_child(mesh_instance)
 				
 			self.image_viewer.get_parent().visible = false
@@ -117,7 +131,3 @@ func on_item_activated():
 		self.image_viewer.texture = imgTex
 	
 	pass
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
