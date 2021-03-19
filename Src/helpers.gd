@@ -59,6 +59,27 @@ func get_model_flag_string(flags):
 	return to_string_flags
 # End Func
 
+func get_texture_flag_string(flags):
+	var to_string = {
+		Constants.Tex_Flags.HALF_RES: "Half Res",
+		Constants.Tex_Flags.SEE_ALPHA: "See Alpha",
+		Constants.Tex_Flags.CLAMP_S: "Clamp S",
+		Constants.Tex_Flags.CLAMP_T: "Clamp T",
+		Constants.Tex_Flags.ANIM: "Anim",
+		Constants.Tex_Flags.TEX_SHIFT: "Tex Shift",
+		Constants.Tex_Flags.HAS_ALPHA: "Has Alpha",
+		Constants.Tex_Flags.INVALID: "Invalid",
+		Constants.Tex_Flags.DUAL_TEX: "Dual Tex",
+	}
+	var to_string_flags = []
+	for flag in to_string.keys():
+		if (flag & flags):
+			to_string_flags.append(to_string[flag])
+		# End If
+	# End For
+
+	return to_string_flags
+
 func get_texture_format_string(format):
 	var to_string = {
 		Constants.Tex_Formats.ABGR_1555: "ABGR 1555",
