@@ -46,9 +46,11 @@ func load_anim(anim_model, obj_model, index):
 	var model_meshes = {}
 	for bone in anim_model.skeletons[index].data.bones:
 		for i in range(len(obj_model.rom_objs)):
-			var name = "%s%s" % [anim_model.skeletons[index].name, bone.name]
+			#var name = "%s%s" % [anim_model.skeletons[index].name, bone.name]
+			var name = bone.name
 			
-			if obj_model.obj_defs[i].name == name:
+			if name in obj_model.obj_defs[i].name:
+			#if obj_model.obj_defs[i].name == name:
 				# No data!
 				if !obj_model.obj_data[i]:
 					break
@@ -57,6 +59,8 @@ func load_anim(anim_model, obj_model, index):
 				model_meshes[bone.name] = load_mesh(obj_model, i, bone)
 				
 				for mesh in model_meshes[bone.name]:
+					# Temp: Until we can fix model vs skeleton scaling
+					mesh.scale = Vector3(2.0, 2.0, 2.0)
 					skeleton.add_child(mesh)
 					mesh.owner = anim_root
 				break
@@ -74,7 +78,7 @@ func load_anim(anim_model, obj_model, index):
 	anim_root.add_child(anim_player)
 	anim_player.owner = anim_root
 	
-	anim_player.play("Default")
+	anim_player.play("READY")
 	
 	return anim_root
 
@@ -126,7 +130,7 @@ func load_texture(model, index, options = []):
 	var file_path = ui_controller.loaded_path
 	var extension = ui_controller.loaded_extension
 	var model_item = model.rom_texs[index]
-	return self.texture_builder.build("%s/textures.%s" % [file_path, extension], model_item, options)
+	return self.texture_builder.build("%s/TEXTURES.%s" % [file_path, extension], model_item, options)
 # End Func
 
 func load_object_texture(model, index, sub_obj_index = -1):

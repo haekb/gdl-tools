@@ -266,29 +266,53 @@ class Anim:
 			
 			var debug_ftell = f.get_position()
 			
-			# Decompiled code, uhhh...yea it's interesting
+			# Decompiled code, this will skip past the useless header in the block data
 			var jump_spot = (_anim.current_skeleton.animation_headers[index].frame_count + 0x1f >> 5) * 4
 			
-			f.seek( jump_spot )
+			Helpers.seek_ahead( jump_spot, f )
 			
 			var total_size = self.size + _anim.current_skeleton.animation_headers[index].frame_count
 			
-			for _i in range( total_size ):
-				self.data.append( f.get_float() )
-			# End For
 			
-			# For now read as a vector!
-			var to_vec = []
-			var vec = Vector3()
-
-			for i in range( len(self.data) ):
-				to_vec.append(self.data[i])
-				
-				if len(to_vec) == 3:
-					self.transforms.append( Vector3(to_vec[0], to_vec[1], to_vec[2]) )
-					to_vec = []
-				# End If
-			# End For
+			
+#			for _i in range( total_size ):
+#				self.data.append( f.get_float() )
+#			# End For
+			for _i in range( total_size ):
+				if size == 3:
+					var x = f.get_8()
+					var y = f.get_8()
+					var z = f.get_8()
+					x = float(x) / 256.0
+					y = float(x) / 256.0
+					z = float(x) / 256.0
+					self.data.append( Vector3(x, y, z) )
+				elif size == 6:
+					var x = f.get_16()
+					var y = f.get_16()
+					var z = f.get_16()
+					x = float(x) / 65536.0
+					y = float(x) / 65536.0
+					z = float(x) / 65536.0
+					self.data.append( Vector3(x, y, z) )
+				elif size == 1:
+					var xyz = f.get_8()
+					xyz = float(xyz) / 256.0
+					self.data.append( Vector3(xyz, xyz, xyz) )
+					
+			
+#			# For now read as a vector!
+#			var to_vec = []
+#			var vec = Vector3()
+#
+#			for i in range( len(self.data) ):
+#				to_vec.append(self.data[i])
+#
+#				if len(to_vec) == 3:
+#					self.transforms.append( Vector3(to_vec[0], to_vec[1], to_vec[2]) )
+#					to_vec = []
+#				# End If
+#			# End For
 			
 			# For now hop back
 			f.seek(sequence_pointer)

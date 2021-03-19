@@ -49,7 +49,10 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		var vertex = obj_vertices[vi].vector
 		
 		# Scale it down a bit...
+		#vertex *= 0.0
+		#vertex *= 0.02
 		vertex *= 0.008
+		#vertex *= 0.016
 		#vertex *= 0.003
 		
 		# Switch from model space to skeleton space (which sounds real cool.)

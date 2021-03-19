@@ -98,4 +98,45 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 	anim.loop = true
 	anim_player.add_animation("Default", anim)
 	
+	# Okay go through the transforms and make some animations!
+	
+	if len(skeleton.data.animations) == 0:
+		return anim_player
+	
+	# Loop through sequences...
+	
+	var header = skeleton.data.animation_headers[0]
+	var fps = header.frame_rate
+	var frames = header.frame_count
+	
+	anim = Animation.new()
+	var length = 0
+	for bi in range(len(skeleton.data.bones)):
+		var sequence = skeleton.data.animations[bi][0]
+		
+		if sequence.size == 0:
+			continue
+		
+		var bone = skeleton.data.bones[bi]
+		var key = "Skeleton:%s" % bone.name
+		var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
+		anim.track_set_path(track_id, key)
+		
+		for frame in range(frames):
+			var time = (float(frame) / float(fps)) * 10
+			
+			var matrix = godot_skeleton.get_bone_rest(bi)
+			var translation = matrix.origin 
+			var rotation  = Quat(sequence.data[frame])
+			
+			anim.transform_track_insert_key(track_id, time, translation, rotation, Vector3(1.0, 1.0, 1.0))
+			length = time + 1.0
+		# End For
+		
+	# End For
+	
+	anim.length = length
+	anim.loop = true #header.loop
+	anim_player.add_animation(header.name, anim)
+	
 	return anim_player

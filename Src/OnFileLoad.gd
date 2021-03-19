@@ -10,7 +10,11 @@ var loaded_anim_model = null
 func anim_loader(root : TreeItem):
 	var file_path = ui_controller.loaded_path
 	var extension = ui_controller.loaded_extension
-	var anim = self.anim_builder.build("%s/anim.%s" % [file_path, extension], [])
+	
+	if "players" in file_path.to_lower():
+		file_path += "\\..\\anim"
+	
+	var anim = self.anim_builder.build("%s/ANIM.%s" % [file_path, extension], [])
 	self.loaded_anim_model = anim
 	
 	for i in range(len(anim.skeletons)):
