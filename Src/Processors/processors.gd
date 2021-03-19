@@ -12,7 +12,7 @@ class Processors:
 		if format in self.processors:
 			return self.processors[format].process(data, width, height, flags)
 		# End If
-		print("Format %d is not yet supported!" % format)
+		print("Format %s is not yet supported!" % Helpers.get_texture_format_string(format))
 		return []
 	# End Func
 # End Class
