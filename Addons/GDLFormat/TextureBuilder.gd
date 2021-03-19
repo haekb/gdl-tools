@@ -5,6 +5,9 @@ func _ready():
 	#self.build("D:\\GameDev\\opengdl\\GameData\\STATIC\\textures.ps2", [])
 	pass
 
+var model = null
+var texture = null
+
 func build(source_file, rom_tex, options):
 	var file = File.new()
 	if file.open(source_file, File.READ) != OK:
@@ -25,6 +28,7 @@ func build(source_file, rom_tex, options):
 	var model = tex_file.Textures.new()
 	
 	var response = model.read(file, rom_tex)
+	self.model = model
 	
 	file.close()
 	
@@ -37,5 +41,7 @@ func build(source_file, rom_tex, options):
 	
 	if 'no_filter' in options:
 		texture.set_flags(0)
+		
+	self.texture = texture
 	
 	return texture

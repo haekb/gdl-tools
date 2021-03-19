@@ -59,6 +59,33 @@ func get_model_flag_string(flags):
 	return to_string_flags
 # End Func
 
+func get_texture_format_string(format):
+	var to_string = {
+		Constants.Tex_Formats.ABGR_1555: "ABGR 1555",
+		Constants.Tex_Formats.BGR_555: "BGR 555",
+		Constants.Tex_Formats.ABGR_8888: "ABGR 8888",
+		Constants.Tex_Formats.BGR_888: "BGR 888",
+		Constants.Tex_Formats.IDX_4_ABGR_1555: "IDX 4 - ABGR 1555",
+		Constants.Tex_Formats.IDX_4_BGR_555: "IDX 4 - BGR 555",
+		Constants.Tex_Formats.IDX_4_ABGR_8888: "IDX 4 - ABGR 8888",
+		Constants.Tex_Formats.IDX_4_BGR_888: "IDX 4 - BGR 888",
+		Constants.Tex_Formats.IDX_8_ABGR_1555: "IDX 8 - ABGR 1555",
+		Constants.Tex_Formats.IDX_8_BGR_555: "IDX 8 - BGR 555",
+		Constants.Tex_Formats.IDXA_88: "IDXA 88",
+		Constants.Tex_Formats.IDX_8_ABGR_8888: "IDX 8 - ABGR 8888",
+		Constants.Tex_Formats.IDX_8_BGR_888: "IDX 8 - BGR 888",
+		Constants.Tex_Formats.IDX_8_A_8: "IDX 8 A 8",
+		Constants.Tex_Formats.IDX_8_I_8: "IDX 8 I 8",
+		Constants.Tex_Formats.IDX_4_A_4: "IDX 4 A 4",
+		Constants.Tex_Formats.IDX_4_I_4: "IDX 4 I 4",
+	}
+	
+	if format in to_string:
+		return to_string[format]
+	
+	return "Unknown"
+# End Func
+
 # Signed to unsigned byte
 func stub(value):
 	if value < 0:

@@ -23,7 +23,7 @@ class TextureFormat:
 	static func cast(data, width, height, flags, format):
 		var return_data = []
 		
-		print("FORMAT %d" % format)
+		print("FORMAT %s" % Helpers.get_texture_format_string(format))
 		
 		var processors = load('res://Src/Processors/processors.gd').Processors.new()
 		
@@ -41,6 +41,7 @@ class TextureFormat:
 
 class Textures:
 	var image = null
+	var format = null
 	
 	func read_texture(f : File, width, height, flags, format):
 		var read_width = width
@@ -83,6 +84,8 @@ class Textures:
 #		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, tex_data_rgb888a)
 #		image.save_png("./texture_test.png")
 		
+		
+		
 		return tex_data_rgb888a
 	# End Func
 
@@ -95,6 +98,9 @@ class Textures:
 		
 		f.seek(rom_tex.tex_data_pointer)
 		
+		print()
+		
+		self.format = format
 		self.image = read_texture(f, width, height, flags, format)
 		
 		return Helpers.make_response(Helpers.IMPORT_RETURN.SUCCESS)
