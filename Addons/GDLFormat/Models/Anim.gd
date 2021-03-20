@@ -255,6 +255,10 @@ class Anim:
 		var data = []
 		var transforms = []
 		
+		var locations = []
+		var rotations = []
+		var scales = []
+		
 		func read(_anim : Anim, index, f : File):
 			self.type = f.get_16()
 			self.size = f.get_16()
@@ -273,32 +277,69 @@ class Anim:
 			
 			var total_size = self.size + _anim.current_skeleton.animation_headers[index].frame_count
 			
+			# Fill in some blanks
+			for _i in range(_anim.current_skeleton.animation_headers[index].frame_count):
+				locations.append(Vector3())
+				rotations.append(Vector3())
+				scales.append(Vector3(1, 1, 1))
 			
+			var current_type = type
+			for i in range(_anim.current_skeleton.animation_headers[index].frame_count):
+				var rotation = rotations[i]
+				var location = locations[i]
+				var scale = scales[i]
+				
+				# Rotation data
+				if current_type & 0x1:
+					rotation.x = f.get_float()
+				if current_type & 0x2:
+					rotation.y = f.get_float()
+				if current_type & 0x4:
+					rotation.z = f.get_float()
+				if current_type & 0x10:
+					location.x = f.get_float()
+				if current_type & 0x20:
+					location.y = f.get_float()
+				if current_type & 0x40:
+					location.z = f.get_float()
+				if current_type & 0x100:
+					scale.x = f.get_float()
+				if current_type & 0x200:
+					scale.y = f.get_float()
+				if current_type & 0x400:
+					scale.z = f.get_float()
+					
+				rotations[i] = rotation
+				locations[i] = location
+				scales[i] = scale
+				
+				#current_type = current_type + self.size * 4
+				#break
 			
 #			for _i in range( total_size ):
 #				self.data.append( f.get_float() )
 #			# End For
-			for _i in range( total_size ):
-				if size == 3:
-					var x = Helpers.utsb(f.get_8())
-					var y = Helpers.utsb(f.get_8())
-					var z = Helpers.utsb(f.get_8())
-					x = float(x) / 256.0
-					y = float(x) / 256.0
-					z = float(x) / 256.0
-					self.data.append( Vector3(x, y, z) )
-				elif size == 6:
-					var x = Helpers.utsh(f.get_16())
-					var y = Helpers.utsh(f.get_16())
-					var z = Helpers.utsh(f.get_16())
-					x = float(x) / 65536.0
-					y = float(x) / 65536.0
-					z = float(x) / 65536.0
-					self.data.append( Vector3(x, y, z) )
-				elif size == 1:
-					var xyz = Helpers.utsb(f.get_8())
-					xyz = float(xyz) / 256.0
-					self.data.append( Vector3(xyz, xyz, xyz) )
+#			for _i in range( total_size ):
+#				if size == 3:
+#					var x = Helpers.utsb(f.get_8())
+#					var y = Helpers.utsb(f.get_8())
+#					var z = Helpers.utsb(f.get_8())
+#					x = float(x) / 256.0
+#					y = float(x) / 256.0
+#					z = float(x) / 256.0
+#					self.data.append( Vector3(x, y, z) )
+#				elif size == 6:
+#					var x = Helpers.utsh(f.get_16())
+#					var y = Helpers.utsh(f.get_16())
+#					var z = Helpers.utsh(f.get_16())
+#					x = float(x) / 65536.0
+#					y = float(x) / 65536.0
+#					z = float(x) / 65536.0
+#					self.data.append( Vector3(x, y, z) )
+#				elif size == 1:
+#					var xyz = Helpers.utsb(f.get_8())
+#					xyz = float(xyz) / 256.0
+#					self.data.append( Vector3(xyz, xyz, xyz) )
 					
 			
 #			# For now read as a vector!

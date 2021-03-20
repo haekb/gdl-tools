@@ -125,11 +125,12 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		for frame in range(frames):
 			var time = (float(frame) / float(fps)) * 10
 			
-			var matrix = godot_skeleton.get_bone_rest(bi)
-			var translation = matrix.origin 
-			var rotation  = Quat(sequence.data[frame])
+			#var matrix = godot_skeleton.get_bone_rest(bi)
+			var translation = sequence.locations[frame]
+			var rotation  = Quat(sequence.rotations[frame])
+			var scale = sequence.scales[frame]
 			
-			anim.transform_track_insert_key(track_id, time, translation, rotation, Vector3(1.0, 1.0, 1.0))
+			anim.transform_track_insert_key(track_id, time, translation, rotation, scale)
 			length = time + 1.0
 		# End For
 		
