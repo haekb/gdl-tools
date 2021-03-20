@@ -280,23 +280,23 @@ class Anim:
 #			# End For
 			for _i in range( total_size ):
 				if size == 3:
-					var x = f.get_8()
-					var y = f.get_8()
-					var z = f.get_8()
+					var x = Helpers.utsb(f.get_8())
+					var y = Helpers.utsb(f.get_8())
+					var z = Helpers.utsb(f.get_8())
 					x = float(x) / 256.0
 					y = float(x) / 256.0
 					z = float(x) / 256.0
 					self.data.append( Vector3(x, y, z) )
 				elif size == 6:
-					var x = f.get_16()
-					var y = f.get_16()
-					var z = f.get_16()
+					var x = Helpers.utsh(f.get_16())
+					var y = Helpers.utsh(f.get_16())
+					var z = Helpers.utsh(f.get_16())
 					x = float(x) / 65536.0
 					y = float(x) / 65536.0
 					z = float(x) / 65536.0
 					self.data.append( Vector3(x, y, z) )
 				elif size == 1:
-					var xyz = f.get_8()
+					var xyz = Helpers.utsb(f.get_8())
 					xyz = float(xyz) / 256.0
 					self.data.append( Vector3(xyz, xyz, xyz) )
 					
