@@ -326,112 +326,13 @@ class Anim:
 						scale.y = Helpers.utsb(f.get_8()) / 256.0
 					if current_type & 0x400:
 						scale.z = Helpers.utsb(f.get_8()) / 256.0
-				
-				
-#				# Rotation data
-#				if is_compressed and i != 0:
-#					if current_type & 0x1:
-#						rotation.x = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x2:
-#						rotation.y = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x4:
-#						rotation.z = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x10:
-#						location.x = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x20:
-#						location.y = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x40:
-#						location.z = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x100:
-#						scale.x = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x200:
-#						scale.y = Helpers.utsb(f.get_8()) / 256.0
-#					if current_type & 0x400:
-#						scale.z = Helpers.utsb(f.get_8()) / 256.0
-#				else:
-#					if current_type & 0x1:
-#						rotation.x = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x2:
-#						rotation.y = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x4:
-#						rotation.z = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x10:
-#						location.x = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x20:
-#						location.y = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x40:
-#						location.z = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x100:
-#						scale.x = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x200:
-#						scale.y = Helpers.utsh(f.get_16()) / 65536.0
-#					if current_type & 0x400:
-#						scale.z = Helpers.utsh(f.get_16()) / 65536.0
-						
-#					if current_type & 0x1:
-#						rotation.x = f.get_float()
-#					if current_type & 0x2:
-#						rotation.y = f.get_float()
-#					if current_type & 0x4:
-#						rotation.z = f.get_float()
-#					if current_type & 0x10:
-#						location.x = f.get_float()
-#					if current_type & 0x20:
-#						location.y = f.get_float()
-#					if current_type & 0x40:
-#						location.z = f.get_float()
-#					if current_type & 0x100:
-#						scale.x = f.get_float()
-#					if current_type & 0x200:
-#						scale.y = f.get_float()
-#					if current_type & 0x400:
-#						scale.z = f.get_float()
 					
 				rotations[i] = rotation
 				locations[i] = location
 				scales[i] = scale
 				
-				#current_type = current_type + self.size * 4
 				#break
-			
-#			for _i in range( total_size ):
-#				self.data.append( f.get_float() )
-#			# End For
-#			for _i in range( total_size ):
-#				if size == 3:
-#					var x = Helpers.utsb(f.get_8())
-#					var y = Helpers.utsb(f.get_8())
-#					var z = Helpers.utsb(f.get_8())
-#					x = float(x) / 256.0
-#					y = float(x) / 256.0
-#					z = float(x) / 256.0
-#					self.data.append( Vector3(x, y, z) )
-#				elif size == 6:
-#					var x = Helpers.utsh(f.get_16())
-#					var y = Helpers.utsh(f.get_16())
-#					var z = Helpers.utsh(f.get_16())
-#					x = float(x) / 65536.0
-#					y = float(x) / 65536.0
-#					z = float(x) / 65536.0
-#					self.data.append( Vector3(x, y, z) )
-#				elif size == 1:
-#					var xyz = Helpers.utsb(f.get_8())
-#					xyz = float(xyz) / 256.0
-#					self.data.append( Vector3(xyz, xyz, xyz) )
-					
-			
-#			# For now read as a vector!
-#			var to_vec = []
-#			var vec = Vector3()
-#
-#			for i in range( len(self.data) ):
-#				to_vec.append(self.data[i])
-#
-#				if len(to_vec) == 3:
-#					self.transforms.append( Vector3(to_vec[0], to_vec[1], to_vec[2]) )
-#					to_vec = []
-#				# End If
-#			# End For
+			# End For
 			
 			# For now hop back
 			f.seek(sequence_pointer)

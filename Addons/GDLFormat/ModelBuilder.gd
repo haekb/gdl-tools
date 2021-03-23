@@ -70,9 +70,9 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	# End For
 	
 	for i in range(len(vertices)):
-		#if bone:
-		#	st.add_weights([1.0, 0.0, 0.0, 0.0])
-		#	st.add_bones([bone.id, 0, 0, 0])
+		if bone:
+			st.add_weights([1.0, 0.0, 0.0, 0.0])
+			st.add_bones([bone.id, 0, 0, 0])
 		
 		st.add_uv(obj_uvs[i].uv)
 		st.add_normal(obj_skip_vertices[i].normal)

@@ -130,7 +130,7 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		# End While
 		
 		for mesh in meshes:
-			var key = "%s" % mesh.name
+			var key = "Skeleton:%s" % bone.name
 			var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
 			anim.track_set_path(track_id, key)
 			#anim.track_set_interpolation_type(track_id, Animation.INTERPOLATION_NEAREST)

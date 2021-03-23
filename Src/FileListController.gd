@@ -63,7 +63,7 @@ func load_anim(anim_model, obj_model, index):
 					mesh.translation = bone.bind_matrix.origin
 					# Temp: Until we can fix model vs skeleton scaling
 					#mesh.scale = Vector3(2.0, 2.0, 2.0)
-					anim_root.add_child(mesh)
+					skeleton.add_child(mesh)
 					mesh.owner = anim_root
 				break
 			# End If
