@@ -131,8 +131,8 @@ class Anim:
 				
 				for i in range(_anim.current_animation_data.sequence_count):
 					# Only first one for now...
-					if i > 0:
-						continue
+					#if i > 0:
+					#	continue
 					# End If	
 					
 					var sequence = _anim.AnimSequence.new()
@@ -187,9 +187,10 @@ class Anim:
 		var sequence_count = 0 # Animations
 		var object_count = 0 # Bones
 		
-		var compress_ang = 0
-		var compress_pos = 0
-		var compress_unit = 0
+		# Arrays of 256 items, if an animation is compressed it'll contain an index to either of these
+		var compress_ang = []
+		var compress_pos = []
+		var compress_unit = []
 		
 		func read(_anim : Anim, f : File):
 			_anim.current_animation_position = f.get_position()
@@ -205,17 +206,20 @@ class Anim:
 			
 			if self.compress_ang_pointer > 0:
 				_anim.anim_seek(self.compress_ang_pointer, f)
-				self.compress_ang = f.get_32()
+				for _i in range(256):
+					self.compress_ang.append(f.get_float())
 			# End If
 			
 			if self.compress_pos_pointer > 0:
 				_anim.anim_seek(self.compress_pos_pointer, f)
-				self.compress_pos = f.get_32()
+				for _i in range(256):
+					self.compress_pos.append(f.get_float())# * 0.008)
 			# End If
 			
 			if self.compress_unit_pointer > 0:
 				_anim.anim_seek(self.compress_unit_pointer, f)
-				self.compress_unit = f.get_32()
+				for _i in range(256):
+					self.compress_unit.append(f.get_float())
 			# End If
 		# End Class
 		
@@ -265,6 +269,7 @@ class Anim:
 			self.data_pointer = f.get_32()
 			
 			var sequence_pointer = f.get_position()
+			var anim_data = _anim.current_animation_data
 			
 			_anim.anim_seek(self.data_pointer + _anim.current_animation_data.block_pointer, f)
 			
@@ -283,31 +288,104 @@ class Anim:
 				rotations.append(Vector3())
 				scales.append(Vector3(1, 1, 1))
 			
+			var is_compressed = type & 0x2000 != 0
+			
+			if self.size == 0:
+				# For now hop back
+				f.seek(sequence_pointer)
+				return
+			
 			var current_type = type
 			for i in range(_anim.current_skeleton.animation_headers[index].frame_count):
 				var rotation = rotations[i]
 				var location = locations[i]
 				var scale = scales[i]
 				
-				# Rotation data
-				if current_type & 0x1:
-					rotation.x = f.get_float()
-				if current_type & 0x2:
-					rotation.y = f.get_float()
-				if current_type & 0x4:
-					rotation.z = f.get_float()
-				if current_type & 0x10:
-					location.x = f.get_float()
-				if current_type & 0x20:
-					location.y = f.get_float()
-				if current_type & 0x40:
-					location.z = f.get_float()
-				if current_type & 0x100:
-					scale.x = f.get_float()
-				if current_type & 0x200:
-					scale.y = f.get_float()
-				if current_type & 0x400:
-					scale.z = f.get_float()
+				if is_compressed:
+					if current_type & 0x1:
+						var rot_index = Helpers.utsb(f.get_8())
+						rotation.x = anim_data.compress_ang[rot_index]
+					if current_type & 0x2:
+						var rot_index = Helpers.utsb(f.get_8())
+						rotation.y = anim_data.compress_ang[rot_index]
+					if current_type & 0x4:
+						var rot_index = Helpers.utsb(f.get_8())
+						rotation.z = anim_data.compress_ang[rot_index]
+					if current_type & 0x10:
+						var loc_index = Helpers.utsb(f.get_8())
+						location.x = anim_data.compress_pos[loc_index]
+					if current_type & 0x20:
+						var loc_index = Helpers.utsb(f.get_8())
+						location.y = anim_data.compress_pos[loc_index]
+					if current_type & 0x40:
+						var loc_index = Helpers.utsb(f.get_8())
+						location.z = anim_data.compress_pos[loc_index]
+					if current_type & 0x100:
+						scale.x = Helpers.utsb(f.get_8()) / 256.0
+					if current_type & 0x200:
+						scale.y = Helpers.utsb(f.get_8()) / 256.0
+					if current_type & 0x400:
+						scale.z = Helpers.utsb(f.get_8()) / 256.0
+				
+				
+#				# Rotation data
+#				if is_compressed and i != 0:
+#					if current_type & 0x1:
+#						rotation.x = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x2:
+#						rotation.y = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x4:
+#						rotation.z = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x10:
+#						location.x = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x20:
+#						location.y = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x40:
+#						location.z = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x100:
+#						scale.x = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x200:
+#						scale.y = Helpers.utsb(f.get_8()) / 256.0
+#					if current_type & 0x400:
+#						scale.z = Helpers.utsb(f.get_8()) / 256.0
+#				else:
+#					if current_type & 0x1:
+#						rotation.x = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x2:
+#						rotation.y = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x4:
+#						rotation.z = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x10:
+#						location.x = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x20:
+#						location.y = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x40:
+#						location.z = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x100:
+#						scale.x = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x200:
+#						scale.y = Helpers.utsh(f.get_16()) / 65536.0
+#					if current_type & 0x400:
+#						scale.z = Helpers.utsh(f.get_16()) / 65536.0
+						
+#					if current_type & 0x1:
+#						rotation.x = f.get_float()
+#					if current_type & 0x2:
+#						rotation.y = f.get_float()
+#					if current_type & 0x4:
+#						rotation.z = f.get_float()
+#					if current_type & 0x10:
+#						location.x = f.get_float()
+#					if current_type & 0x20:
+#						location.y = f.get_float()
+#					if current_type & 0x40:
+#						location.z = f.get_float()
+#					if current_type & 0x100:
+#						scale.x = f.get_float()
+#					if current_type & 0x200:
+#						scale.y = f.get_float()
+#					if current_type & 0x400:
+#						scale.z = f.get_float()
 					
 				rotations[i] = rotation
 				locations[i] = location

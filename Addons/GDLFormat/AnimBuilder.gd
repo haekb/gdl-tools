@@ -47,8 +47,8 @@ func setup_skeleton(anim):
 				continue
 			# End If
 	
-			#for child_bone in bone.children:
-			#	child_bone.bind_matrix = bone.bind_matrix.inverse() * child_bone.bind_matrix
+			for child_bone in bone.children:
+				child_bone.bind_matrix = bone.bind_matrix * child_bone.bind_matrix
 			# End For
 		# End For
 	# End For
@@ -71,7 +71,7 @@ func build_skeleton(anim, index):
 		# End If
 		
 		godot_skeleton.set_bone_rest(bi, bone.bind_matrix)
-		godot_skeleton.set_bone_pose(bi, bone.bind_matrix)
+		#godot_skeleton.set_bone_pose(bi, bone.bind_matrix)
 	# End For
 	
 	return godot_skeleton
@@ -80,20 +80,20 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 	var anim = Animation.new()
 	var skeleton = model.skeletons[index]
 	
-	# Pre-make our track ids
-	for bi in range(len(skeleton.data.bones)):
-		var bone = skeleton.data.bones[bi]
-		
-		var key = "Skeleton:%s" % bone.name
-		var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
-		anim.track_set_path(track_id, key)
-		
-		var matrix = godot_skeleton.get_bone_rest(bi)
-		var translation = matrix.origin 
-		var rotation  = matrix.basis.get_rotation_quat()
-		
-		anim.transform_track_insert_key(bi, 0, translation, rotation, Vector3(1.0, 1.0, 1.0))
-	# End For
+#	# Pre-make our track ids
+#	for bi in range(len(skeleton.data.bones)):
+#		var bone = skeleton.data.bones[bi]
+#
+#		var key = "Skeleton:%s" % bone.name
+#		var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
+#		anim.track_set_path(track_id, key)
+#
+#		var matrix = godot_skeleton.get_bone_rest(bi)
+#		var translation = matrix.origin 
+#		var rotation  = matrix.basis.get_rotation_quat()
+#
+#		anim.transform_track_insert_key(bi, 0, translation, rotation, Vector3(1.0, 1.0, 1.0))
+#	# End For
 	
 	anim.loop = true
 	anim_player.add_animation("Default", anim)
@@ -104,40 +104,82 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		return anim_player
 	
 	# Loop through sequences...
-	
-	var header = skeleton.data.animation_headers[0]
+	var sequence_index = 0
+	var header = skeleton.data.animation_headers[sequence_index]
 	var fps = header.frame_rate
 	var frames = header.frame_count
 	
 	anim = Animation.new()
+	
+	
 	var length = 0
 	for bi in range(len(skeleton.data.bones)):
-		var sequence = skeleton.data.animations[bi][0]
+		var sequence = skeleton.data.animations[bi][sequence_index]
 		
 		if sequence.size == 0:
 			continue
 		
 		var bone = skeleton.data.bones[bi]
-		var key = "Skeleton:%s" % bone.name
-		var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
-		anim.track_set_path(track_id, key)
 		
-		for frame in range(frames):
-			var time = (float(frame) / float(fps)) * 10
+		var meshes = []
+		
+		for child in godot_skeleton.get_parent().get_children():
+			if bone.name in child.name:
+				meshes.append(child)
+			# End If
+		# End While
+		
+		for mesh in meshes:
+			var key = "%s" % mesh.name
+			var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
+			anim.track_set_path(track_id, key)
+			#anim.track_set_interpolation_type(track_id, Animation.INTERPOLATION_NEAREST)
 			
-			#var matrix = godot_skeleton.get_bone_rest(bi)
-			var translation = sequence.locations[frame]
-			var rotation  = Quat(sequence.rotations[frame])
-			var scale = sequence.scales[frame]
-			
-			anim.transform_track_insert_key(track_id, time, translation, rotation, scale)
-			length = time + 1.0
-		# End For
+			for frame in range(frames):
+				var time = (float(frame) / float(fps)) * 10
+				
+				#var matrix = godot_skeleton.get_bone_rest(bi)
+				var translation = mesh.translation#mesh.translation + sequence.locations[frame]
+				var rotation  = sequence.rotations[frame]#Quat(mesh.rotation + sequence.rotations[frame])
+				var scale = sequence.scales[frame]
+				
+				rotation.x = rad2deg(rotation.x)
+				rotation.y = rad2deg(rotation.y)
+				rotation.z = rad2deg(rotation.z)
+				
+				var fixed_rot = rotation#set_euler_zyx(rotation).get_euler()
+				
+				rotation = Quat(mesh.rotation + fixed_rot)
+				
+				anim.transform_track_insert_key(track_id, time, translation, rotation, scale)
+				length = time + 1.0
+				#break
+			# End For
 		
 	# End For
 	
 	anim.length = length
 	anim.loop = true #header.loop
-	anim_player.add_animation(header.name, anim)
+	anim_player.add_animation("Test", anim)#header.name, anim)
 	
 	return anim_player
+
+func set_euler_zyx(euler):
+	var c = 0.0
+	var s = 0.0
+	
+	c = cos(euler.x)
+	s = sin(euler.x)
+	var x_mat = Basis( Vector3(1.0, 0.0, 0.0), Vector3(0.0, c, -s), Vector3(0.0, s, c) )
+	
+	c = cos(euler.y)
+	s = sin(euler.y)
+	var y_mat = Basis( Vector3(c, 0.0, s), Vector3(0.0, 1.0, 0.0), Vector3(-s, 0.0, c) )
+	
+	c = cos(euler.z)
+	s = sin(euler.z)
+	var z_mat = Basis( Vector3(c, -s, 0.0), Vector3(s, c, 0.0), Vector3(0.0, 0.0, 1.0))
+	
+	return z_mat * y_mat * x_mat
+	
+	
