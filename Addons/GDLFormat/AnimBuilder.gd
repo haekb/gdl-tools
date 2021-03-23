@@ -129,31 +129,31 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 			# End If
 		# End While
 		
-		for mesh in meshes:
-			var key = "Skeleton:%s" % bone.name
-			var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
-			anim.track_set_path(track_id, key)
-			#anim.track_set_interpolation_type(track_id, Animation.INTERPOLATION_NEAREST)
+		#for mesh in meshes:
+		var key = "Skeleton:%s" % bone.name
+		var track_id = anim.add_track(Animation.TYPE_TRANSFORM)
+		anim.track_set_path(track_id, key)
+		#anim.track_set_interpolation_type(track_id, Animation.INTERPOLATION_NEAREST)
+		
+		for frame in range(frames):
+			var time = (float(frame) / float(fps)) * 10
 			
-			for frame in range(frames):
-				var time = (float(frame) / float(fps)) * 10
-				
-				#var matrix = godot_skeleton.get_bone_rest(bi)
-				var translation = mesh.translation#mesh.translation + sequence.locations[frame]
-				var rotation  = sequence.rotations[frame]#Quat(mesh.rotation + sequence.rotations[frame])
-				var scale = sequence.scales[frame]
-				
-				rotation.x = rad2deg(rotation.x)
-				rotation.y = rad2deg(rotation.y)
-				rotation.z = rad2deg(rotation.z)
-				
-				var fixed_rot = rotation#set_euler_zyx(rotation).get_euler()
-				
-				rotation = Quat(mesh.rotation + fixed_rot)
-				
-				anim.transform_track_insert_key(track_id, time, translation, rotation, scale)
-				length = time + 1.0
-				#break
+			#var matrix = godot_skeleton.get_bone_rest(bi)
+			var translation = sequence.locations[frame]#mesh.translation#mesh.translation + sequence.locations[frame]
+			var rotation  = sequence.rotations[frame]#Quat(mesh.rotation + sequence.rotations[frame])
+			var scale = sequence.scales[frame]
+			
+			rotation.x = rad2deg(rotation.x)
+			rotation.y = rad2deg(rotation.y)
+			rotation.z = rad2deg(rotation.z)
+			
+			#var fixed_rot = rotation#set_euler_zyx(rotation).get_euler()
+			
+			rotation = Quat(rotation)#mesh.rotation + fixed_rot)
+			
+			anim.transform_track_insert_key(track_id, time, translation, rotation, scale)
+			length = time + 1.0
+			#break
 			# End For
 		
 	# End For
