@@ -154,25 +154,19 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 			rotation.y = rad2deg(rotation.y)
 			rotation.z = rad2deg(rotation.z)
 			
-#
-#			      res[iVar2] = fVar3 + frac * (((*(float *)(iVar1 + (int)pyr1) - fVar3) - 6.28318548) +
-#                                  6.28318548);
-			
-#			var interp_rotation = rotation
-#			if frame > 0:
-#				if rotation.x != last_rotation.x:
-#					interp_rotation.x = rotation.x + frac * ((last_rotation.x - rotation.x) - 6.28318548) + 6.28318548
-#				if rotation.y != last_rotation.y:
-#					interp_rotation.y = rotation.y + frac * ((last_rotation.y - rotation.y) - 6.28318548) + 6.28318548
-#				if rotation.z != last_rotation.z:
-#					interp_rotation.z = rotation.z + frac * ((last_rotation.z - rotation.z) - 6.28318548) + 6.28318548
+			if frame > 0:
+				var interp_rotation = get_pyr_interp(frac, rotation, last_rotation)
+				rotation = interp_rotation
 
-			rotation += last_rotation
+			#rotation += last_rotation
 			last_rotation = rotation
 			
-			#var fixed_rot = rotation#set_euler_zyx(rotation).get_euler()
-			
-			rotation = Quat(rotation)#mesh.rotation + fixed_rot)
+			if header.flags & 1 != 0:
+				rotation.y = -rotation.y
+				rotation.z = -rotation.z
+				
+
+			rotation = Quat(rotation)
 			
 			anim.transform_track_insert_key(track_id, time, translation, rotation, scale)
 			length = time + 1.0
@@ -186,6 +180,34 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 	anim_player.add_animation("Test", anim)#header.name, anim)
 	
 	return anim_player
+
+func get_pyr_interp(fraction, rotation_a, rotation_b):
+	var interp_rotation = Vector3()
+	
+	if rotation_a == rotation_b:
+		return rotation_a
+	
+	for i in 3:
+		interp_rotation[i] = rotation_a[i] + fraction * ((rotation_b[i] - rotation_a[i]) - 6.28318548) + 6.28318548
+	# End If
+	
+	return interp_rotation
+#	var res = rotation_b
+#
+#	var var_4 = rotation_b - res
+#
+#	# Do per each axis
+#	for i in 3:
+#		var var_1 = var_4[i] + res[i]
+#		var var_2 = var_1[i] + (rotation_a[i] - rotation_b[i])
+#		var var_3 = var_1[i]
+#		var var_6 = (var_2[i] < var_3[i]) << 8 | (var_2[i] == var_3[i]) << 0xe
+#		if (var_6):
+#			var_3[i] = var_3 - var_2
+#
+#		else:
+#			res[i] = var_2[i]
+#		# End If
 
 func set_euler_zyx(euler):
 	var c = 0.0
