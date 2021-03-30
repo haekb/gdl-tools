@@ -118,6 +118,8 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		
 		if sequence.size == 0:
 			continue
+			
+		var type = sequence.type
 		
 		var bone = skeleton.data.bones[bi]
 		
@@ -135,8 +137,13 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		anim.track_set_path(track_id, key)
 		#anim.track_set_interpolation_type(track_id, Animation.INTERPOLATION_NEAREST)
 		
+		if type & 0x4000:
+			continue
+		
+		var last_rotation = Vector3()
 		for frame in range(frames):
 			var time = (float(frame) / float(fps)) * 10
+			var frac = (float(frame) / float(fps))
 			
 			#var matrix = godot_skeleton.get_bone_rest(bi)
 			var translation = sequence.locations[frame]#mesh.translation#mesh.translation + sequence.locations[frame]
@@ -146,6 +153,22 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 			rotation.x = rad2deg(rotation.x)
 			rotation.y = rad2deg(rotation.y)
 			rotation.z = rad2deg(rotation.z)
+			
+#
+#			      res[iVar2] = fVar3 + frac * (((*(float *)(iVar1 + (int)pyr1) - fVar3) - 6.28318548) +
+#                                  6.28318548);
+			
+#			var interp_rotation = rotation
+#			if frame > 0:
+#				if rotation.x != last_rotation.x:
+#					interp_rotation.x = rotation.x + frac * ((last_rotation.x - rotation.x) - 6.28318548) + 6.28318548
+#				if rotation.y != last_rotation.y:
+#					interp_rotation.y = rotation.y + frac * ((last_rotation.y - rotation.y) - 6.28318548) + 6.28318548
+#				if rotation.z != last_rotation.z:
+#					interp_rotation.z = rotation.z + frac * ((last_rotation.z - rotation.z) - 6.28318548) + 6.28318548
+
+			rotation += last_rotation
+			last_rotation = rotation
 			
 			#var fixed_rot = rotation#set_euler_zyx(rotation).get_euler()
 			

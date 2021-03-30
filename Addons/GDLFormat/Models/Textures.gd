@@ -62,6 +62,8 @@ class Textures:
 			read += 1024
 		elif format == Constants.Tex_Formats.IDX_8_ABGR_1555:
 			read += 512
+		elif format == Constants.Tex_Formats.UNK_DREAMCAST:
+			read *= 2
 			
 		if format == Constants.Tex_Formats.ABGR_1555:
 			# Two bytes per pixel
@@ -70,7 +72,11 @@ class Textures:
 		#	# Two bytes per pixel
 		#	read *= 2
 		
-		if !f.endian_swap:
+		if format == Constants.Tex_Formats.UNK_DREAMCAST:
+			for _i in range(read):
+				tex_data.append(f.get_16())
+			# End For
+		elif !f.endian_swap:
 			tex_data = Array(f.get_buffer(read))
 		else:
 			for _i in range(read):

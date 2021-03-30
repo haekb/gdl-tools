@@ -1,5 +1,17 @@
 extends Node
 
+enum DC_Tex_Attributes {
+	Twiddled = 1,
+	Twiddled_MipMaps = 2,
+	Vector_Quantized = 3,
+	Vector_Quantized_MipMaps = 4
+	Vector_Quantized_Custom_Codebook = 16
+	Vector_Quantized_Custom_Codebook_MipMaps = 17
+	Raw = 11,
+	Raw_Non_Square = 12,
+	Twiddled_Non_Square = 13,
+}
+
 # Texture Formats
 enum Tex_Formats {
 	ABGR_1555 = 0,
@@ -18,9 +30,13 @@ enum Tex_Formats {
 	IDX_8_A_8 = 130,
 	IDX_8_I_8 = 131,
 	IDX_4_A_4 = 146,
-	IDX_4_I_4 = 147
+	IDX_4_I_4 = 147,
 	
-	END = 255
+	END_PS2 = 255,
+	
+	# Outside of the char range
+	
+	UNK_DREAMCAST = 256,
 }
 
 enum Tex_Flags {

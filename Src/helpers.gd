@@ -60,6 +60,26 @@ func get_model_flag_string(flags):
 # End Func
 
 func get_texture_flag_string(flags):
+	# Dreamcast hack
+	if typeof(flags) == TYPE_ARRAY:
+		var to_string = {
+			Constants.DC_Tex_Attributes.Twiddled: "Twiddled",
+			Constants.DC_Tex_Attributes.Twiddled_MipMaps: "Twiddled (with MipMaps)",
+			Constants.DC_Tex_Attributes.Twiddled_Non_Square: "Twiddled (Non-Square)",
+			Constants.DC_Tex_Attributes.Vector_Quantized: "Vector Quantized",
+			Constants.DC_Tex_Attributes.Vector_Quantized_MipMaps: "Vector Quantized (with Mipmaps)",
+			Constants.DC_Tex_Attributes.Vector_Quantized_Custom_Codebook: "Vector Quantuzed (With Custom Codebook)",
+			Constants.DC_Tex_Attributes.Vector_Quantized_Custom_Codebook_MipMaps: "Vector Quantized (With Custom Codebook & MipMaps)",
+			Constants.DC_Tex_Attributes.Raw: "Raw",
+			Constants.DC_Tex_Attributes.Raw_Non_Square: "Raw (Non-Square)",
+		}
+		
+		if flags[0] in to_string:
+			return [to_string[flags[0]]]
+		else:
+			return []
+	# End If
+	
 	var to_string = {
 		Constants.Tex_Flags.HALF_RES: "Half Res",
 		Constants.Tex_Flags.SEE_ALPHA: "See Alpha",

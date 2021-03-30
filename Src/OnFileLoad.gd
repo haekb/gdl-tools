@@ -37,7 +37,8 @@ func object_loader(path):
 	var anims = file_list.create_item(root)
 	anims.set_text(0, "Anims")
 	
-	anim_loader(anims)
+	if "ps2" in path.to_lower():
+		anim_loader(anims)
 	
 	var objs = file_list.create_item(root)
 	objs.set_text(0, "Objects")
@@ -74,6 +75,9 @@ func object_loader(path):
 		var item = file_list.create_item(model_texs)
 		item.set_text(0, "%s" % obj_def.name)
 		item.set_metadata(0, {'id': obj_def.index, 'sub_id': -1})
+		
+		if len(obj_model.rom_objs) == 0:
+			continue
 		
 		var rom_obj = obj_model.rom_objs[obj_def.index]
 		

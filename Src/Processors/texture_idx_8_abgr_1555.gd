@@ -78,8 +78,11 @@ class Texture_IDX_8_ABGR_1555:
 			if !has_alpha:
 				image_data.append(255)
 			else:
-				image_data.append(a << 3)
-			
+				if a > 0:
+					image_data.append(255)
+				else:
+					image_data.append(0)
+	
 			pos += 1
 		# End While
 

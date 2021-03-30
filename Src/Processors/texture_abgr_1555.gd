@@ -38,7 +38,11 @@ class Texture_ABGR_1555:
 					if !(flags & Constants.Tex_Flags.HAS_ALPHA):
 						image_data.append(255)
 					else:
-						image_data.append((a << 3) * 16)
+						if a > 0:
+							image_data.append(255)
+						else:
+							image_data.append(0)
+
 					
 					short = []
 			# End For
