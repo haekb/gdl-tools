@@ -283,8 +283,8 @@ class Objects:
 		# Constants for various things
 		const OBJ_START_SIGNATURE = 0x6C018000
 		
-		const SIGNAL_MODE_UNK_5BYTE = 0x6F # V4-5 - 4 Items packed in 5 bytes
-		const SIGNAL_MODE_UNK_8BYTE = 0x6D # V4-16 (4 items, 16 bytes) # Possibly level-based
+		#const SIGNAL_MODE_UNK_5BYTE = 0x6F # V4-5 - 4 Items packed in 5 bytes
+		const SIGNAL_MODE_INT_VEC2 = 0x6D # V4-16 (4 items, 16 bytes) # Possibly level-based
 		# Confirmed
 		const SIGNAL_MODE_HEADER = 0x6C # V4-32 (4 items, 32 bytes) (Doesn't quite line up..)
 		# Vertex
@@ -333,6 +333,13 @@ class Objects:
 					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
 					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
 					self.uv = Vector2( u, v )
+				elif mode == SIGNAL_MODE_INT_VEC2:
+					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					
+					var u2 = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					var v2 = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					self.uv = Vector2( u, v )
 				else:
 					var u = float(Helpers.utsb(f.get_8())) / 128.0
 					var v = float(Helpers.utsb(f.get_8())) / 128.0
@@ -348,7 +355,7 @@ class Objects:
 			var skip = false
 			var normal = Vector3()
 			
-			func read(f : File):
+			func read(mode, f : File):
 				# Still unsure how this all works, but it does work!
 				self.byte_1 = f.get_8()
 				self.byte_2 = f.get_8()
@@ -362,6 +369,23 @@ class Objects:
 				var z = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
 				self.normal = Vector3(x,y,z)
 				
+			# End Func
+		# End Class
+		
+		class VertexColour:
+			var colour_555 = 0
+			var colour = Color()
+			
+			func read(mode, f : File):
+				# Might be 565?
+				self.colour_555 = f.get_16()
+				
+				var b = (self.colour_555 & 0x7C00) >> 10
+				var g = (self.colour_555 & 0x3E0) >> 5
+				var r = (self.colour_555) & 0x1F
+				
+				# We also need to expand it to 8-bit
+				self.colour = Color8( r << 3, g << 3, b << 3 )
 			# End Func
 		# End Class
 		
@@ -392,24 +416,50 @@ class Objects:
 					return "UV"
 				elif self.is_skip_vertex():
 					return "Skip Vertex"
+				elif self.is_vertex_colour():
+					return "Vertex Colour"
 				return "Unknown"
 			# End Func
 			
+#			func is_header():
+#				return self.mode in [SIGNAL_MODE_HEADER]
+#			# End Func
+#
+#			func is_vertex():
+#				return self.mode in [SIGNAL_MODE_CHAR_3, SIGNAL_MODE_SHORT_3]
+#			# End Func
+#
+#			func is_uv():
+#				return self.mode in [SIGNAL_MODE_CHAR_2, SIGNAL_MODE_SHORT_2]
+#			# End Func
+#
+#			func is_skip_vertex():
+#				return self.mode in [SIGNAL_MODE_INT_4]
+#			# End Func
+#
+#			func is_level_unk():
+#				return self.mode in [SIGNAL_MODE_INT_VEC4]
+
 			func is_header():
-				return self.mode in [SIGNAL_MODE_HEADER]
+				return self.index == 0
 			# End Func
 			
 			func is_vertex():
-				return self.mode in [SIGNAL_MODE_CHAR_3, SIGNAL_MODE_SHORT_3]
-			# End Func
-			
-			func is_uv():
-				return self.mode in [SIGNAL_MODE_CHAR_2, SIGNAL_MODE_SHORT_2]
+				return self.index == 1
 			# End Func
 			
 			func is_skip_vertex():
-				return self.mode in [SIGNAL_MODE_INT_4]
+				return self.index == 2
 			# End Func
+			
+			func is_vertex_colour():
+				return self.index == 3
+			# End Func
+			
+			func is_uv():
+				return self.index == 4
+			# End Func
+
 		# End Class
 
 		# Good reference: https://github.com/ps2dev/ps2sdk/blob/8b7579979db87ace4b0aa5693a8a560d15224a96/common/include/vif_codes.h
@@ -437,6 +487,7 @@ class Objects:
 		var skip_vertices = []
 		var uvs = []
 		var unk_vec2 = []
+		var vertex_colours = []
 		
 		func read(Obj : Objects, rom_obj: RomObj, f : File):
 			# This includes the main mesh
@@ -450,6 +501,7 @@ class Objects:
 				var obj_uvs = []
 				var obj_skip_vertices = []
 				var obj_unk_vec2 = []
+				var obj_vertex_colour = []
 					
 				last_position = f.get_position()
 				var unpack_command = f.get_32()
@@ -483,8 +535,6 @@ class Objects:
 						
 						if ps2_signal.is_header():
 							f.seek((4 * 2) + f.get_position())
-							
-							
 							unk_vec2 = (Vector2( f.get_float(), f.get_float() ))
 						elif ps2_signal.is_vertex():
 							for _i in range(ps2_signal.data_count - 1):
@@ -512,8 +562,14 @@ class Objects:
 						elif ps2_signal.is_skip_vertex():
 							for _i in range(ps2_signal.data_count):
 								var skip_vertex = SkipVertex.new()
-								skip_vertex.read(f)
+								skip_vertex.read(ps2_signal.mode, f)
 								obj_skip_vertices.append(skip_vertex)
+							# End For
+						elif ps2_signal.is_vertex_colour():
+							for _i in range(ps2_signal.data_count):
+								var colour = VertexColour.new()
+								colour.read(ps2_signal.mode, f)
+								obj_vertex_colour.append(colour)
 							# End For
 						else:
 							print("[ObjData::read] Unknown signal %d at %d! Breaking from loop." % [ps2_signal.mode, f.get_position()])
@@ -542,6 +598,8 @@ class Objects:
 				self.uvs.append(obj_uvs)
 				self.skip_vertices.append(obj_skip_vertices)
 				self.unk_vec2.append(obj_unk_vec2)
+				self.vertex_colours.append(obj_vertex_colour)
+				
 				
 			# End While
 #			self.vertices = obj_vertices

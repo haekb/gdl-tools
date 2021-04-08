@@ -9,6 +9,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var obj_uvs = obj_data.uvs[sub_obj_index]
 	var obj_skip_vertices = obj_data.skip_vertices[sub_obj_index]
 	var obj_unk_vec2 = obj_data.unk_vec2[sub_obj_index]
+	var obj_vertex_colour = obj_data.vertex_colours[sub_obj_index]
 	
 	var vertices = []
 	var uvs = []
@@ -73,8 +74,13 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		if bone:
 			st.add_weights([1.0, 0.0, 0.0, 0.0])
 			st.add_bones([bone.id, 0, 0, 0])
+			
+		if len(obj_uvs) > 0:
+			st.add_uv(obj_uvs[i].uv)
 		
-		st.add_uv(obj_uvs[i].uv)
+		if len(obj_vertex_colour) > 0:
+			st.add_color(obj_vertex_colour[i].colour)
+		
 		st.add_normal(obj_skip_vertices[i].normal)
 		st.add_vertex(vertices[i])
 	# End For

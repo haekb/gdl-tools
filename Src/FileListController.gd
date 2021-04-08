@@ -117,6 +117,7 @@ func load_mesh(model, index, rom_skeleton = null):
 		var mat = SpatialMaterial.new()
 		mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
 		mat.metallic_specular = 0.0
+		mat.vertex_color_use_as_albedo = true
 		
 		# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
 		# So let's just render both sides...
