@@ -1,7 +1,10 @@
 extends Node
 
 func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
-	print("Building %s" % name)
+	var no_log = "no_log" in options
+	
+	if !no_log:
+		print("Building %s" % name)
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	
@@ -11,13 +14,15 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var obj_unk_vec2 = obj_data.unk_vec2[sub_obj_index]
 	var obj_vertex_colour = obj_data.vertex_colours[sub_obj_index]
 	
+	
 	var vertices = []
 	var uvs = []
 	var indexes = []
 	var normals = []
 	
 	var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
-	print("Object Flags: ", flags)
+	if !no_log:
+		print("Object Flags: ", flags)
 	
 	# Points
 	var p1 = 0

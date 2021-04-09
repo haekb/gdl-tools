@@ -23,7 +23,7 @@ class TextureFormat:
 	static func cast(data, width, height, flags, format):
 		var return_data = []
 		
-		print("Format: %s" % Helpers.get_texture_format_string(format))
+		#print("Format: %s" % Helpers.get_texture_format_string(format))
 		
 		var processors = load('res://Src/Processors/processors.gd').Processors.new()
 		
@@ -105,7 +105,7 @@ class Textures:
 		f.seek(rom_tex.tex_data_pointer)
 		
 		var string_flags = Helpers.get_texture_flag_string(flags)
-		print("Texture Flags: ", string_flags)
+		#print("Texture Flags: ", string_flags)
 		
 		self.format = format
 		self.image = read_texture(f, width, height, flags, format)

@@ -9,12 +9,15 @@ var model = null
 var texture = null
 
 func build(source_file, rom_tex, options):
+	var no_log = "no_log" in options
+	
 	var file = File.new()
 	if file.open(source_file, File.READ) != OK:
 		print("Failed to open %s" % source_file)
 		return null
-		
-	print("Opened %s" % source_file)
+	
+	if !no_log:
+		print("Opened %s" % source_file)
 	
 	
 	#if ".ngc" in source_file:

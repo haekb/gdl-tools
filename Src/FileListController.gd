@@ -97,9 +97,9 @@ func load_mesh(model, index, rom_skeleton = null):
 	
 	var meshes = []
 	
-	print("Generating %d meshes..." % len(obj_data.vertices))
+	#print("Generating %d meshes..." % len(obj_data.vertices))
 	for i in range(len(obj_data.vertices)):
-		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, rom_skeleton, [])
+		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, rom_skeleton, ['no_log'])
 		var mesh_instance = MeshInstance.new()
 		
 		mesh_instance.name = "%s - %d" % [obj_def.name, i]
@@ -110,9 +110,9 @@ func load_mesh(model, index, rom_skeleton = null):
 			tex_index = model_item.sub_obj_data[i - 1]['tex_index']
 		# End If
 		
-		print("Texture Index: %d" % tex_index)
+		#print("Texture Index: %d" % tex_index)
 		
-		var imgTex = load_texture(model, tex_index, [])
+		var imgTex = load_texture(model, tex_index, ['no_log'])
 		
 		var mat = SpatialMaterial.new()
 		mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
@@ -146,7 +146,7 @@ func load_object_texture(model, index, sub_obj_index = -1):
 		index = obj.sub_obj_data[sub_obj_index]['tex_index']
 	# End If
 
-	return load_texture(model, index, ['no_filter'])
+	return load_texture(model, index, ['no_filter', 'no_log'])
 # End Func
 
 #func new_world_object(world_objs, index):
@@ -185,6 +185,9 @@ func load_world(world_model, obj_model, options = []):
 	
 	for world_obj in world_objs:
 		
+		if world_obj.node_pointer != 1:
+			continue
+		
 		# Find the darn model
 		for i in range(len(obj_model.rom_objs)):
 			#var name = "%s%s" % [anim_model.skeletons[index].name, bone.name]
@@ -200,8 +203,23 @@ func load_world(world_model, obj_model, options = []):
 					break
 				
 				for mesh_instance in mesh_instances:
+					
+					var position = world_obj.position
+					
+					if world_obj.parent:
+						position += world_obj.parent.position
 
-					mesh_instance.set_translation(world_obj.position)# * Constants.Mesh_Scale)
+# T2ELEV bounds
+#min
+#[20.3, 3.0, -13.7]
+#Array(3) [ 20.3, 3, -13.7 ]
+#max
+#[29.5, 8.0, -13.7]
+#Array(3) [ 29.5, 8, -13.7 ]
+
+					mesh_instance.set_translation(world_obj.position * 1)
+					mesh_instance.scale /= 128#0.01#78
+					#mesh_instance.scale *= 0.125
 					mesh_viewer.add_child(mesh_instance)
 					mesh_instance.owner = mesh_viewer
 					
@@ -262,7 +280,7 @@ func on_item_activated():
 			
 			var mesh_instances = load_mesh(model, index)
 			for mesh_instance in mesh_instances:
-
+				mesh_instance.scale /= 128
 				mesh_viewer.add_child(mesh_instance)
 				mesh_instance.owner = mesh_viewer
 				

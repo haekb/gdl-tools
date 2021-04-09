@@ -100,6 +100,9 @@ class Worlds:
 		var collision_triangle_count = 0
 		var collision_triangle_index = 0
 		
+		var parent = null
+		var child = null
+		
 		func read(world : World, f : File):
 			self.name = f.get_buffer(16).get_string_from_ascii()
 			self.flags = f.get_32()

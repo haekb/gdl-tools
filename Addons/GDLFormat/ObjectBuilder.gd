@@ -1,12 +1,15 @@
 extends Node
 
 func build(source_file, options):
+	var no_log = "no_log" in options
+	
 	var file = File.new()
 	if file.open(source_file, File.READ) != OK:
 		print("Failed to open %s" % source_file)
 		return null
 		
-	print("Opened %s" % source_file)
+	if !no_log:
+		print("Opened %s" % source_file)
 	
 	# Not needed?
 	#if ".ngc" in source_file:
@@ -31,7 +34,8 @@ func build(source_file, options):
 		var obj_file = load(path)
 		model = obj_file.Objects.new()
 	else:
-		print("Unknown Objects format %d" % version)
+		if !no_log:
+			print("Unknown Objects format %d" % version)
 		return null
 	# End If
 		
