@@ -20,6 +20,11 @@ Constants="*res://Src/constants.gd"
 Helpers="*res://Src/helpers.gd"
 GlobalSignals="*res://Src/global_signals.gd"
 
+[debug]
+
+gdscript/warnings/unused_variable=false
+gdscript/warnings/unused_argument=false
+
 [display]
 
 window/size/width=1280

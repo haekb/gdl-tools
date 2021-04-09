@@ -43,7 +43,7 @@ class Textures:
 	var image = null
 	var format = null
 	
-	func read_texture(f : File, width, height, flags, format):
+	func read_texture(f : File, width, height, flags, pformat):
 		var read_width = width
 		var read_height = height
 		var bytes = 1
@@ -58,21 +58,21 @@ class Textures:
 		# TODO: Figure out how to stick these in the processors...
 		
 		# Include the palette
-		if format == Constants.Tex_Formats.IDX_8_ABGR_8888:
+		if pformat == Constants.Tex_Formats.IDX_8_ABGR_8888:
 			read += 1024
-		elif format == Constants.Tex_Formats.IDX_8_ABGR_1555:
+		elif pformat == Constants.Tex_Formats.IDX_8_ABGR_1555:
 			read += 512
-		elif format == Constants.Tex_Formats.UNK_DREAMCAST:
+		elif pformat == Constants.Tex_Formats.UNK_DREAMCAST:
 			read *= 2
 			
-		if format == Constants.Tex_Formats.ABGR_1555:
+		if pformat == Constants.Tex_Formats.ABGR_1555:
 			# Two bytes per pixel
 			read *= 2
 		#if format == Constants.Tex_Formats.IDX_8_ABGR_1555:
 		#	# Two bytes per pixel
 		#	read *= 2
 		
-		if format == Constants.Tex_Formats.UNK_DREAMCAST:
+		if pformat == Constants.Tex_Formats.UNK_DREAMCAST:
 			for _i in range(read):
 				tex_data.append(f.get_16())
 			# End For
@@ -84,7 +84,7 @@ class Textures:
 			# End For
 		# End If
 
-		var tex_data_rgb888a = TextureFormat.cast(tex_data, width, height, flags, format)
+		var tex_data_rgb888a = TextureFormat.cast(tex_data, width, height, flags, pformat)
 		
 #		var image = Image.new()
 #		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, tex_data_rgb888a)
@@ -99,7 +99,7 @@ class Textures:
 		var size = rom_tex.size
 		var width = rom_tex.width
 		var height = rom_tex.height
-		var format = rom_tex.format
+		var lformat = rom_tex.format
 		var flags = rom_tex.flags
 		
 		f.seek(rom_tex.tex_data_pointer)
@@ -107,8 +107,8 @@ class Textures:
 		var string_flags = Helpers.get_texture_flag_string(flags)
 		#print("Texture Flags: ", string_flags)
 		
-		self.format = format
-		self.image = read_texture(f, width, height, flags, format)
+		self.format = lformat
+		self.image = read_texture(f, width, height, flags, lformat)
 		
 		return Helpers.make_response(Helpers.IMPORT_RETURN.SUCCESS)
 	# End Func

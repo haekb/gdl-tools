@@ -176,25 +176,28 @@ func load_object_texture(model, index, sub_obj_index = -1):
 #
 #		index += 1
 #		world_obj = world_objs[index]
-
+var total_time_wasted = 0
 func load_world(world_model, obj_model, options = []):
 	if world_model == null:
 		return
 	
 	var world_objs = world_model.world_objs
 	
+	# This doesn't waste that much time,
+	# Building the meshes is the slow part!!
 	for world_obj in world_objs:
 		
 		if world_obj.node_pointer != 1:
 			continue
 		
+		var start = OS.get_unix_time()
+		var end = 0
 		# Find the darn model
 		for i in range(len(obj_model.rom_objs)):
 			#var name = "%s%s" % [anim_model.skeletons[index].name, bone.name]
 			var name = world_obj.name
 			
 			if name == obj_model.obj_defs[i].name:
-				#load_mesh(obj_model, i, null)
 				
 				var mesh_instances = load_mesh(obj_model, i)
 				
@@ -207,7 +210,12 @@ func load_world(world_model, obj_model, options = []):
 					var position = world_obj.position
 					
 					if world_obj.parent:
-						position += world_obj.parent.position
+						var wo = world_obj
+						while true:
+							if wo.parent == null:
+								break
+							position += wo.parent.position
+							wo = wo.parent
 
 # T2ELEV bounds
 #min
@@ -217,7 +225,7 @@ func load_world(world_model, obj_model, options = []):
 #[29.5, 8.0, -13.7]
 #Array(3) [ 29.5, 8, -13.7 ]
 
-					mesh_instance.set_translation(world_obj.position * 1)
+					mesh_instance.set_translation(position)
 					mesh_instance.scale /= 128#0.01#78
 					#mesh_instance.scale *= 0.125
 					mesh_viewer.add_child(mesh_instance)
@@ -228,10 +236,14 @@ func load_world(world_model, obj_model, options = []):
 				break
 			# End If
 		# End For
+		end = OS.get_unix_time()
+		
+		if end != 0:
+			self.total_time_wasted += end - start
 	# End For
 		
 		
-	
+	print("Total time wasted %d" % self.total_time_wasted)
 	pass
 
 func on_item_activated():
