@@ -52,7 +52,8 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		# Scale it down a bit...
 		#vertex *= 0.0
 		#vertex *= 0.02
-		vertex *= 0.008
+		if bone:
+			vertex *= Constants.Mesh_Scale
 		#vertex *= 0.016
 		#vertex *= 0.003
 		

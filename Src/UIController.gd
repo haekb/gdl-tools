@@ -3,6 +3,7 @@ extends Node
 onready var file_loader = get_node("./Scripts/FileLoader")
 var loaded_model = null
 var loaded_anim = null
+var loaded_world = null
 var loaded_path = ""
 var loaded_filename = ""
 var loaded_extension = ""
@@ -30,4 +31,5 @@ func on_file_dropped(files: PoolStringArray, screen: int):
 	var loaded_files = file_loader.on_file_load(files[0])
 	self.loaded_model = loaded_files[0]
 	self.loaded_anim = loaded_files[1]
+	self.loaded_world = loaded_files[2]
 # End Func

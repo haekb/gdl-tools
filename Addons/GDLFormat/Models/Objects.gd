@@ -369,6 +369,10 @@ class Objects:
 				var z = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
 				self.normal = Vector3(x,y,z)
 				
+				# >> 7 seems to check if over 128
+				# Order seems to be skip, skip, not skip, not skip, continue...
+				
+				pass
 			# End Func
 		# End Class
 		

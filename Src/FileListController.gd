@@ -149,6 +149,73 @@ func load_object_texture(model, index, sub_obj_index = -1):
 	return load_texture(model, index, ['no_filter'])
 # End Func
 
+#func new_world_object(world_objs, index):
+#	var world_obj = world_objs[index]
+#
+#	while true:
+#
+#		if world_obj.flags & 0x800:
+#			if world_obj.node_pointer == 0x1 || world_obj.flags & 0x80000000 != 0:
+#				# Create
+#				pass
+#			else:
+#				# Create
+#				pass
+#		else:
+#			# Create
+#			pass
+#
+#		# If Flags & 0x100 != 0
+#			# Flags = Flags & 0xffffffc5 #?
+#
+#		if world_obj.child_index > -1:
+#			new_world_object(world_objs, index)
+#		if world_obj.next_index < 0:
+#			return
+#		# End If
+#
+#		index += 1
+#		world_obj = world_objs[index]
+
+func load_world(world_model, obj_model, options = []):
+	if world_model == null:
+		return
+	
+	var world_objs = world_model.world_objs
+	
+	for world_obj in world_objs:
+		
+		# Find the darn model
+		for i in range(len(obj_model.rom_objs)):
+			#var name = "%s%s" % [anim_model.skeletons[index].name, bone.name]
+			var name = world_obj.name
+			
+			if name == obj_model.obj_defs[i].name:
+				#load_mesh(obj_model, i, null)
+				
+				var mesh_instances = load_mesh(obj_model, i)
+				
+				# No match, not geometry
+				if mesh_instances == null:
+					break
+				
+				for mesh_instance in mesh_instances:
+
+					mesh_instance.set_translation(world_obj.position)# * Constants.Mesh_Scale)
+					mesh_viewer.add_child(mesh_instance)
+					mesh_instance.owner = mesh_viewer
+					
+				self.image_viewer.get_parent().visible = false
+				
+				break
+			# End If
+		# End For
+	# End For
+		
+		
+	
+	pass
+
 func on_item_activated():
 	var item = self.get_selected()
 	var parent = item.get_parent()
@@ -164,10 +231,14 @@ func on_item_activated():
 	# Ignore categories
 	if text == "Objects" or text == "Textures" or text == "Anims":
 		return
+		
+
 	
 	var model = ui_controller.loaded_model
 	var anim_model = ui_controller.loaded_anim
+	var world_model = ui_controller.loaded_world
 	
+
 	var mesh_children = mesh_viewer.get_children()
 	if len(mesh_children):
 		for child in mesh_children:
@@ -175,6 +246,12 @@ func on_item_activated():
 			child.queue_free()
 		# End For
 	# End If
+	
+	# Hack
+	if text == "World Objects":
+		load_world(world_model, model, [])
+		return
+	
 	
 	# TODO: Clean up!!
 	if parent_text == "Objects":
