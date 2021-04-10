@@ -180,6 +180,7 @@ var total_time_wasted = 0
 func load_world(world_model, obj_model, options = []):
 	if world_model == null:
 		return
+
 	
 	var world_objs = world_model.world_objs
 	
@@ -209,7 +210,7 @@ func load_world(world_model, obj_model, options = []):
 					
 					var position = world_obj.position
 					
-					if world_obj.parent:
+					if world_obj.parent and world_obj.flags & 0x1001000 == 0:
 						var wo = world_obj
 						while true:
 							if wo.parent == null:
