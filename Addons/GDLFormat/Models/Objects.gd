@@ -284,7 +284,7 @@ class Objects:
 		const OBJ_START_SIGNATURE = 0x6C018000
 		
 		#const SIGNAL_MODE_UNK_5BYTE = 0x6F # V4-5 - 4 Items packed in 5 bytes
-		const SIGNAL_MODE_INT_VEC2 = 0x6D # V4-16 (4 items, 16 bytes) # Possibly level-based
+		const SIGNAL_MODE_SHORT_VEC2 = 0x6D # V4-16 (4 items, 16 bytes) # Possibly level-based
 		# Confirmed
 		const SIGNAL_MODE_HEADER = 0x6C # V4-32 (4 items, 32 bytes) (Doesn't quite line up..)
 		# Vertex
@@ -293,8 +293,9 @@ class Objects:
 		# UV
 		const SIGNAL_MODE_CHAR_2 = 0x66
 		const SIGNAL_MODE_SHORT_2 = 0x65
-		# Flip Vert related
+		# Flip Vert/Packed Normals related
 		const SIGNAL_MODE_INT_4 = 0x6F
+		const SIGNAL_MODE_INT_3 = 0x68
 		
 		# Helper classes
 		class Vertex:
@@ -311,6 +312,14 @@ class Objects:
 					var y = Helpers.utsh(f.get_16())
 					var z = Helpers.utsh(f.get_16())
 					self.vector = Vector3( float(x), float(y), float(z) )
+				elif mode == SIGNAL_MODE_INT_3:
+					var x = Helpers.utsi(f.get_32())
+					var y = Helpers.utsi(f.get_32())
+					var z = Helpers.utsi(f.get_32())
+					var scale = 1 / 0xFFFF
+					
+					self.vector = Vector3( x, y, z )
+					self.vector *= scale
 				else: # Unknown!
 					var x = Helpers.utsb(f.get_8())
 					var y = Helpers.utsb(f.get_8())
@@ -333,7 +342,7 @@ class Objects:
 					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
 					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
 					self.uv = Vector2( u, v )
-				elif mode == SIGNAL_MODE_INT_VEC2:
+				elif mode == SIGNAL_MODE_SHORT_VEC2:
 					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
 					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
 					
@@ -356,18 +365,31 @@ class Objects:
 			var normal = Vector3()
 			
 			func read(mode, f : File):
-				# Still unsure how this all works, but it does work!
-				self.byte_1 = f.get_8()
-				self.byte_2 = f.get_8()
-				self.skip = bool( (self.byte_2 >> 7) )
 				
-				# Roll back and let's calculate normals!
-				f.seek(f.get_position() - 2)
-				var packed_normal = f.get_16()
-				var x = ((packed_normal & 0x1f) - 0xf) * Constants.Normal_Scale
-				var y = (((packed_normal >> 5) & 0xf) - 0xf) * Constants.Normal_Scale
-				var z = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
-				self.normal = Vector3(x,y,z)
+				if mode == SIGNAL_MODE_INT_3:
+					var x = f.get_32()
+					var y = f.get_32()
+					var z = f.get_32()
+					var scale = 1 / 0xFFFF
+					
+					self.normal = Vector3( x, y, z )
+					self.normal *= scale
+					
+					# No clue!
+					self.skip = y >= 0
+				else:	
+					# Still unsure how this all works, but it does work!
+					self.byte_1 = f.get_8()
+					self.byte_2 = f.get_8()
+					self.skip = bool( (self.byte_2 >> 7) )
+					
+					# Roll back and let's calculate normals!
+					f.seek(f.get_position() - 2)
+					var packed_normal = f.get_16()
+					var x = ((packed_normal & 0x1f) - 0xf) * Constants.Normal_Scale
+					var y = (((packed_normal >> 5) & 0xf) - 0xf) * Constants.Normal_Scale
+					var z = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
+					self.normal = Vector3(x,y,z)
 				
 				# >> 7 seems to check if over 128
 				# Order seems to be skip, skip, not skip, not skip, continue...
@@ -537,11 +559,20 @@ class Objects:
 						var ps2_signal = Signal.new()
 						ps2_signal.read(f)
 						
+						#if ps2_signal.mode == 0x68:
+						#	pass
+						
 						if ps2_signal.is_header():
 							f.seek((4 * 2) + f.get_position())
 							unk_vec2 = (Vector2( f.get_float(), f.get_float() ))
 						elif ps2_signal.is_vertex():
-							for _i in range(ps2_signal.data_count - 1):
+							# Hack for non INT_3 modes!
+							var count = ps2_signal.data_count - 1
+							
+							#if ps2_signal.mode == SIGNAL_MODE_INT_3:
+							#	count += 1
+							
+							for _i in range(count):
 								var debug_pos = f.get_position()
 								var vertex = Vertex.new()
 								vertex.read(ps2_signal.mode, f)
@@ -555,6 +586,8 @@ class Objects:
 								f.seek(3 + f.get_position())
 							elif ps2_signal.mode == SIGNAL_MODE_SHORT_3:
 								f.seek(6 + f.get_position())
+							elif ps2_signal.mode == SIGNAL_MODE_INT_3:
+								f.seek(12 + f.get_position())
 							# End if
 							
 						elif ps2_signal.is_uv():
