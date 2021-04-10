@@ -64,18 +64,41 @@ class Texture_IDX_8_ABGR_8888:
 		
 		palette = process_palette(palette)
 		
+		var big_a = 0
+		var small_a = 255
+		for item in palette:
+			big_a = max(big_a, item[3])
+			small_a = min(small_a, item[3])
+
+		
 		pos = palette_size
 		while pos < data_len:
 			var index = data[pos]
 			var palette_set = palette[ index ]
 			
-			if !has_alpha:
-				palette_set[3] = 255
+			var r = palette_set[0]
+			var g = palette_set[1]
+			var b = palette_set[2]
+			var a = palette_set[3]
 			
-			var r = signed_to_unsigned(palette_set[0])
-			var g = signed_to_unsigned(palette_set[1])
-			var b = signed_to_unsigned(palette_set[2])
-			var a = signed_to_unsigned(palette_set[3])
+			if !has_alpha:
+				a = 255
+			else:
+				# http://skygfx.rockstarvision.com/skygfx.html#PS2atest 
+				# Alpha textures may need to be doubled
+				r = min(r << 1, 255)
+				g = min(g << 1, 255)
+				b = min(b << 1, 255)
+				a = min(a << 1, 255)
+			
+#			var r = signed_to_unsigned( palette_set[0] )
+#			var g = signed_to_unsigned( palette_set[1] )
+#			var b = signed_to_unsigned( palette_set[2] )
+#			var a = signed_to_unsigned( palette_set[3] )
+			#var r = ( palette_set[0] )
+			#var g = ( palette_set[1] )
+			#var b = ( palette_set[2] )
+			#var a = ( palette_set[3] )
 
 			image_data.append(r)
 			image_data.append(g)

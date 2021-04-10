@@ -119,6 +119,9 @@ func load_mesh(model, index, rom_skeleton = null):
 		mat.metallic_specular = 0.0
 		mat.vertex_color_use_as_albedo = true
 		
+		if model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA:
+			mat.flags_transparent = true
+		
 		# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
 		# So let's just render both sides...
 		mat.params_cull_mode = SpatialMaterial.CULL_DISABLED

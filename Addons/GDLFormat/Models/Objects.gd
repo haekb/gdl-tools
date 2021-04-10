@@ -339,15 +339,15 @@ class Objects:
 					var v = float(Helpers.utsb(f.get_8())) / 128.0
 					self.uv = Vector2( u, v )
 				elif mode == SIGNAL_MODE_SHORT_2:
-					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
-					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					var u = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
+					var v = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
 					self.uv = Vector2( u, v )
 				elif mode == SIGNAL_MODE_SHORT_VEC2:
-					var u = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
-					var v = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					var u = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
+					var v = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
 					
-					var u2 = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
-					var v2 = float(Helpers.utsh(f.get_16())) / 256.0#32768.0
+					var u2 = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
+					var v2 = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
 					self.uv = Vector2( u, v )
 				else:
 					var u = float(Helpers.utsb(f.get_8())) / 128.0

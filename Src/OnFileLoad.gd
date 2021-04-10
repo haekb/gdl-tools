@@ -18,6 +18,9 @@ func anim_loader(root : TreeItem):
 	var anim = self.anim_builder.build("%s/ANIM.%s" % [file_path, extension], [])
 	self.loaded_anim_model = anim
 	
+	if anim == null:
+		return
+	
 	for i in range(len(anim.skeletons)):
 		var skeleton = anim.skeletons[i]
 		var skel = file_list.create_item(root)

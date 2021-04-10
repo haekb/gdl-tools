@@ -24,9 +24,9 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var indexes = []
 	var normals = []
 	
-	if !no_log:
-		var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
-		print("Object Flags: ", flags)
+	#if !no_log:
+	var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
+	print("Object Flags: ", flags)
 	
 	# Points
 	var p1 = 0
@@ -88,7 +88,11 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 			st.add_bones([bone.id, 0, 0, 0])
 			
 		if len(obj_uvs) > 0:
-			st.add_uv(obj_uvs[i].uv)
+			
+			var uv = obj_uvs[i].uv
+			#uv[0] *= -1
+			#uv[1] *= -1
+			st.add_uv(uv)
 		
 		if len(obj_vertex_colour) > 0:
 			st.add_color(obj_vertex_colour[i].colour)
