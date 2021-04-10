@@ -216,17 +216,11 @@ func load_world(world_model, obj_model, options = []):
 								break
 							position += wo.parent.position
 							wo = wo.parent
-
-# T2ELEV bounds
-#min
-#[20.3, 3.0, -13.7]
-#Array(3) [ 20.3, 3, -13.7 ]
-#max
-#[29.5, 8.0, -13.7]
-#Array(3) [ 29.5, 8, -13.7 ]
-
+						# End While
+					# End If
+					
 					mesh_instance.set_translation(position)
-					mesh_instance.scale /= 128#0.01#78
+					#mesh_instance.scale /= 128#0.01#78
 					#mesh_instance.scale *= 0.125
 					mesh_viewer.add_child(mesh_instance)
 					mesh_instance.owner = mesh_viewer
@@ -292,7 +286,7 @@ func on_item_activated():
 			
 			var mesh_instances = load_mesh(model, index)
 			for mesh_instance in mesh_instances:
-				mesh_instance.scale /= 128
+				#mesh_instance.scale /= 128
 				mesh_viewer.add_child(mesh_instance)
 				mesh_instance.owner = mesh_viewer
 				

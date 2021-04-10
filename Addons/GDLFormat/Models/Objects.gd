@@ -636,8 +636,7 @@ class Objects:
 				self.skip_vertices.append(obj_skip_vertices)
 				self.unk_vec2.append(obj_unk_vec2)
 				self.vertex_colours.append(obj_vertex_colour)
-				
-				
+
 			# End While
 #			self.vertices = obj_vertices
 #			self.uvs = obj_uvs

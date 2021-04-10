@@ -104,7 +104,7 @@ class Textures:
 		
 		f.seek(rom_tex.tex_data_pointer)
 		
-		var string_flags = Helpers.get_texture_flag_string(flags)
+		#var string_flags = Helpers.get_texture_flag_string(flags)
 		#print("Texture Flags: ", string_flags)
 		
 		self.format = lformat

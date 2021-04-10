@@ -2,6 +2,10 @@ extends Node
 
 func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var no_log = "no_log" in options
+	var show_time = "show_time" in options 
+	
+	var start = OS.get_ticks_msec()
+	var end = OS.get_ticks_msec()
 	
 	if !no_log:
 		print("Building %s" % name)
@@ -20,8 +24,8 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var indexes = []
 	var normals = []
 	
-	var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
 	if !no_log:
+		var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
 		print("Object Flags: ", flags)
 	
 	# Points
@@ -41,8 +45,8 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 			
 			flip = not flip
 			#print("Flip %d" % int(flip))
-		else:
-			pass
+		#else:
+		#	pass
 			#print("^ SKIP VERT!")
 		# End If
 		
@@ -51,24 +55,26 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		p2 = p3
 	# End For
 	
-	for vi in range(len(obj_vertices)):
-		var vertex = obj_vertices[vi].vector
-		
-		# Scale it down a bit...
-		#vertex *= 0.0
-		#vertex *= 0.02
-		if bone:
-			vertex *= Constants.Mesh_Scale
-		#vertex *= 0.016
-		#vertex *= 0.003
-		
-		# Switch from model space to skeleton space (which sounds real cool.)
-		#if bone:
-		#	vertex = bone.bind_matrix * vertex
-		
-		vertices.append(vertex)
-	# End For
 	
+
+	
+#	for vi in range(len(obj_vertices)):
+#		var vertex = obj_vertices[vi].vector
+#
+#		# Scale it down a bit...
+#		#vertex *= 0.0
+#		#vertex *= 0.02
+#		vertex *= Constants.Mesh_Scale
+#		#vertex *= 0.016
+#		#vertex *= 0.003
+#
+#		# Switch from model space to skeleton space (which sounds real cool.)
+#		#if bone:
+#		#	vertex = bone.bind_matrix * vertex
+#
+#		vertices.append(vertex)
+#	# End For
+	start = OS.get_ticks_msec()
 	for i in range(len(indexes)):
 		var index = indexes[i]
 		for vi in index:
@@ -76,7 +82,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		# End For
 	# End For
 	
-	for i in range(len(vertices)):
+	for i in range(len(obj_vertices)):
 		if bone:
 			st.add_weights([1.0, 0.0, 0.0, 0.0])
 			st.add_bones([bone.id, 0, 0, 0])
@@ -88,13 +94,17 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 			st.add_color(obj_vertex_colour[i].colour)
 		
 		st.add_normal(obj_skip_vertices[i].normal)
-		st.add_vertex(vertices[i])
+		st.add_vertex(obj_vertices[i].vector * Constants.Mesh_Scale)
 	# End For
 	
 	# Clean up normals
 	st.generate_normals()
 	
 	var mesh_array = st.commit()
+	
+	end = OS.get_ticks_msec()
+	if show_time:
+		print("Mesh generation time (ms): %d" % (end - start))
 	
 	return mesh_array
 # End Func
