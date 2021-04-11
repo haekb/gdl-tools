@@ -181,7 +181,7 @@ func load_texture(model, index, options = []):
 	var file_path = ui_controller.loaded_path
 	var extension = ui_controller.loaded_extension
 	var model_item = model.rom_texs[index]
-	return self.texture_builder.build("%s/TEXTURES.%s" % [file_path, extension], model_item, options)
+	return self.texture_builder.build("%s/TEXTURES.%s" % [file_path, extension], model_item, index, options)
 # End Func
 
 func load_object_texture(model, index, sub_obj_index = -1):
@@ -287,6 +287,7 @@ func load_world(world_model, obj_model, options = []):
 		
 		
 	print("Total time wasted %d" % self.total_time_wasted)
+	TextureCache.report()
 	pass
 
 func on_item_activated():

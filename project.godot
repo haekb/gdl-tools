@@ -19,6 +19,7 @@ config/icon="res://icon.png"
 Constants="*res://Src/constants.gd"
 Helpers="*res://Src/helpers.gd"
 GlobalSignals="*res://Src/global_signals.gd"
+TextureCache="*res://Src/texture_cache.gd"
 
 [debug]
 

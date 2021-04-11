@@ -47,6 +47,9 @@ class Texture_IDX_8_ABGR_8888:
 		var image_data = []
 		var palette = []
 		
+		var start = OS.get_ticks_msec()
+		var end = OS.get_ticks_msec()
+		
 		var has_alpha = flags & Constants.Tex_Flags.HAS_ALPHA
 		var half_size = flags & Constants.Tex_Flags.HALF_RES
 		
@@ -62,7 +65,16 @@ class Texture_IDX_8_ABGR_8888:
 				current_set = []
 		# End While
 		
+		end = OS.get_ticks_msec()
+		
+		print("Palette loading :", (end-start))
+		start = OS.get_ticks_msec()
+		
 		palette = process_palette(palette)
+		
+		end = OS.get_ticks_msec()
+		print("Palette processing :", (end-start))
+		start = OS.get_ticks_msec()
 		
 		var big_a = 0
 		var small_a = 255
@@ -70,6 +82,9 @@ class Texture_IDX_8_ABGR_8888:
 			big_a = max(big_a, item[3])
 			small_a = min(small_a, item[3])
 
+		end = OS.get_ticks_msec()
+		print("Palette min/max :", (end-start))
+		start = OS.get_ticks_msec()
 		
 		pos = palette_size
 		while pos < data_len:
@@ -107,6 +122,9 @@ class Texture_IDX_8_ABGR_8888:
 			
 			pos += 1
 		# End While
+		
+		end = OS.get_ticks_msec()
+		print("Image assembly :", (end-start))
 
 		return image_data
 	# End Func

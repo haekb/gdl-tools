@@ -139,6 +139,7 @@ func on_file_load(path : String):
 	
 	# Clean up
 	file_list.clear()
+	TextureCache.clear()
 	
 	if "objects." in path.to_lower():
 		self.object_loader(path.to_lower())
