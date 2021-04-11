@@ -331,6 +331,7 @@ class Objects:
 		
 		class UV:
 			var uv = Vector2()
+			var lm_uv = Vector2()
 			
 			func read(mode, f : File):
 				# Divided by max value of the type
@@ -346,9 +347,12 @@ class Objects:
 					var u = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
 					var v = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
 					
-					var u2 = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
-					var v2 = float(Helpers.utsh(f.get_16())) / 128.0#32768.0
+					# Lightmap uv
+					var u2 = float(Helpers.utsh(f.get_16())) * (1.0/32768.0)
+					var v2 = float(Helpers.utsh(f.get_16())) * (1.0/32768.0)
+					
 					self.uv = Vector2( u, v )
+					self.lm_uv = Vector2( u2, v2 )
 				else:
 					var u = float(Helpers.utsb(f.get_8())) / 128.0
 					var v = float(Helpers.utsb(f.get_8())) / 128.0
@@ -361,6 +365,7 @@ class Objects:
 		class SkipVertex:
 			var byte_1 = 0
 			var byte_2 = 0
+			var packed_short = 0
 			var skip = false
 			var normal = Vector3()
 			
@@ -379,17 +384,19 @@ class Objects:
 					self.skip = y >= 0
 				else:	
 					# Still unsure how this all works, but it does work!
-					self.byte_1 = f.get_8()
-					self.byte_2 = f.get_8()
-					self.skip = bool( (self.byte_2 >> 7) )
+					#self.byte_1 = f.get_8()
+					#self.byte_2 = f.get_8()
+					#self.skip = bool( (self.byte_2 >> 7) )
 					
 					# Roll back and let's calculate normals!
-					f.seek(f.get_position() - 2)
+					#f.seek(f.get_position() - 2)
 					var packed_normal = f.get_16()
+					self.packed_short = packed_normal
 					var x = ((packed_normal & 0x1f) - 0xf) * Constants.Normal_Scale
 					var y = (((packed_normal >> 5) & 0xf) - 0xf) * Constants.Normal_Scale
 					var z = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
 					self.normal = Vector3(x,y,z)
+					self.skip = packed_normal >> 15
 				
 				# >> 7 seems to check if over 128
 				# Order seems to be skip, skip, not skip, not skip, continue...

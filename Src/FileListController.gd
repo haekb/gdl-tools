@@ -106,26 +106,54 @@ func load_mesh(model, index, rom_skeleton = null):
 		mesh_instance.mesh = mesh_array
 		
 		var tex_index = model_item.sub_obj_0_tex_index
+		var lm_index = model_item.sub_obj_0_lm_index
 		if i > 0:
 			tex_index = model_item.sub_obj_data[i - 1]['tex_index']
+			lm_index = model_item.sub_obj_data[i - 1]['lm_index']
 		# End If
+
+		
 		
 		#print("Texture Index: %d" % tex_index)
 		
-		var imgTex = load_texture(model, tex_index, ['no_log'])
+		var img_tex = load_texture(model, tex_index, ['no_log'])
 		
-		var mat = SpatialMaterial.new()
-		mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, imgTex)
-		mat.metallic_specular = 0.0
-		mat.vertex_color_use_as_albedo = true
+#		var mat = SpatialMaterial.new()
+#		mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, img_tex)
+#		mat.metallic_specular = 0.0
+#		mat.vertex_color_use_as_albedo = true
+#
+#		if model.rom_objs[index].obj_flags & Constants.Model_Flags.LMAP:
+#			var lm_tex = load_texture(model, lm_index, ['no_log'])
+#			lm_tex.get_data().save_png("lm.png")
+#			mat.set_texture(SpatialMaterial.TEXTURE_DETAIL_ALBEDO, lm_tex)
+#			#mat.set_texture(SpatialMaterial.TEXTURE_DETAIL_MASK, lm_tex)
+#			mat.detail_enabled = true
+#			mat.detail_blend_mode = SpatialMaterial.BLEND_MODE_MUL
+#			mat.detail_uv_layer = SpatialMaterial.DETAIL_UV_2
+#
+#		if model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA:
+#			mat.flags_transparent = true
+#		mat.flags_transparent = false
+#		# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
+#		# So let's just render both sides...
+#		mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
+
+
+		var mat = ShaderMaterial.new()
+		mat.shader = load("res://Shaders/LT1.tres") as VisualShader
 		
+
 		if model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA:
-			mat.flags_transparent = true
-		
-		# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
-		# So let's just render both sides...
-		mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
-		
+			mat.set_shader_param("use_alpha", true)
+
+		mat.set_shader_param("main_texture", img_tex)
+
+		if model.rom_objs[index].obj_flags & Constants.Model_Flags.LMAP:
+			var lm_tex = load_texture(model, lm_index, ['no_log'])
+			mat.set_shader_param("lm_texture", lm_tex)
+
+
 		mesh_instance.set_surface_material(0, mat)
 		meshes.append(mesh_instance)
 	

@@ -19,6 +19,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var obj_vertex_colour = obj_data.vertex_colours[sub_obj_index]
 	
 	
+	
 	var vertices = []
 	var uvs = []
 	var indexes = []
@@ -28,32 +29,72 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
 	print("Object Flags: ", flags)
 	
+	var has_lightmaps = rom_obj.obj_flags & Constants.Model_Flags.LMAP
+	
 	# Points
-	var p1 = 0
-	var p2 = 1
+	#var p1 = 0
+	#var p2 = 1
 	
 	var flip = true
 
-	for p3 in range(2, len(obj_vertices)):
-		if !obj_skip_vertices[p3].skip:
-			if flip:
-				indexes.append([p1, p3, p2])
-			else:
-				indexes.append([p1, p2, p3])
-			# End If
 
+	for i in range(len(obj_vertices)):
+		if i < 2:
+			continue
 			
-			flip = not flip
-			#print("Flip %d" % int(flip))
-		#else:
-		#	pass
-			#print("^ SKIP VERT!")
-		# End If
+		var p1 = i - 2
+		var p2 = i - 1
+		var p3 = i
 		
-		# Carry over!
-		p1 = p2
-		p2 = p3
-	# End For
+		var front_face = obj_unk_vec2[p3][0] == 1.0
+		
+		if !obj_skip_vertices[p3].skip:
+			if front_face:
+				if flip:
+					indexes.append([p1, p3, p2])
+				else:
+					indexes.append([p1, p2, p3])
+				# End If
+			else:
+				if flip:
+					indexes.append([p3, p2, p1])
+				else:
+					indexes.append([p3, p1, p2])
+				# End If
+
+			flip = not flip
+		# End If
+
+#	for p3 in range(2, len(obj_vertices)):
+#		var front_face = obj_unk_vec2[p3][0] == 1.0
+#		#var back_face = obj_unk_vec2[p3][1] == 1.0
+#		if !obj_skip_vertices[p3].skip:
+#
+#			if !front_face:
+#				if flip:
+#					indexes.append([p1, p3, p2])
+#				else:
+#					indexes.append([p1, p2, p3])
+#				# End If
+#			else:
+#				if flip:
+#					indexes.append([p3, p2, p1])
+#				else:
+#					indexes.append([p3, p1, p2])
+#				# End If
+#
+#
+#			flip = not flip
+#			#print("Flip %d" % int(flip))
+#		#else:
+#		#	pass
+#			#print("^ SKIP VERT!")
+#		# End If
+#
+#		# Carry over!
+#		p1 = p2
+#		p2 = p3
+#	# End For
 	
 	
 
@@ -93,6 +134,10 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 			#uv[0] *= -1
 			#uv[1] *= -1
 			st.add_uv(uv)
+			
+			if has_lightmaps:
+				var lm_uv = obj_uvs[i].lm_uv
+				st.add_uv2(lm_uv)
 		
 		if len(obj_vertex_colour) > 0:
 			st.add_color(obj_vertex_colour[i].colour)
@@ -103,7 +148,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	
 	# Clean up normals
 	# Note: Normals are inside out because MeshView Scale.X is -1 to match GDL
-	st.generate_normals(true)
+	st.generate_normals(false)
 	
 	var mesh_array = st.commit()
 	
