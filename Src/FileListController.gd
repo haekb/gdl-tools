@@ -118,40 +118,53 @@ func load_mesh(model, index, rom_skeleton = null):
 		
 		var img_tex = load_texture(model, tex_index, ['no_log'])
 		
-#		var mat = SpatialMaterial.new()
-#		mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, img_tex)
-#		mat.metallic_specular = 0.0
-#		mat.vertex_color_use_as_albedo = true
-#
-#		if model.rom_objs[index].obj_flags & Constants.Model_Flags.LMAP:
-#			var lm_tex = load_texture(model, lm_index, ['no_log'])
-#			lm_tex.get_data().save_png("lm.png")
-#			mat.set_texture(SpatialMaterial.TEXTURE_DETAIL_ALBEDO, lm_tex)
-#			#mat.set_texture(SpatialMaterial.TEXTURE_DETAIL_MASK, lm_tex)
-#			mat.detail_enabled = true
-#			mat.detail_blend_mode = SpatialMaterial.BLEND_MODE_MUL
-#			mat.detail_uv_layer = SpatialMaterial.DETAIL_UV_2
-#
-#		if model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA:
-#			mat.flags_transparent = true
-#		mat.flags_transparent = false
-#		# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
-#		# So let's just render both sides...
-#		mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
-
-
-		var mat = ShaderMaterial.new()
-		mat.shader = load("res://Shaders/LT1.tres") as VisualShader
+		var tex_flags = 0
+		var use_alpha = 0
 		
+		if img_tex:
+			use_alpha = model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA
+		
+		var use_custom_shader = true
+		var mat = null
+		
+		# Use spatial material - Not great support for lightmaps
+		if !use_custom_shader:
+			mat = SpatialMaterial.new()
+			mat.set_texture(SpatialMaterial.TEXTURE_ALBEDO, img_tex)
+			mat.metallic_specular = 0.0
+			mat.vertex_color_use_as_albedo = true
+			mat.vertex_color_is_srgb = true
 
-		if model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA:
-			mat.set_shader_param("use_alpha", true)
+			if model.rom_objs[index].obj_flags & Constants.Model_Flags.LMAP:
+				var lm_tex = load_texture(model, lm_index, ['no_log', 'alpha_as_albedo'])
+				lm_tex.get_data().save_png("lm.png")
+				mat.set_texture(SpatialMaterial.TEXTURE_DETAIL_ALBEDO, lm_tex)
+				#mat.set_texture(SpatialMaterial.TEXTURE_DETAIL_MASK, lm_tex)
+				mat.detail_enabled = true
+				mat.detail_blend_mode = SpatialMaterial.BLEND_MODE_MUL
+				mat.detail_uv_layer = SpatialMaterial.DETAIL_UV_2
 
-		mat.set_shader_param("main_texture", img_tex)
+			if model.rom_texs[tex_index].flags & Constants.Tex_Flags.HAS_ALPHA:
+				mat.flags_transparent = true
+			mat.flags_transparent = false
+			# Required for now, some of our faces are flipped, and I'm not sure how to fix 'em
+			# So let's just render both sides...
+			mat.params_cull_mode = SpatialMaterial.CULL_DISABLED
+		else: # Use custom shader, lightmaps work a-okay here!
+			mat = ShaderMaterial.new()
+			mat.shader = load("res://Shaders/LT1.tres") as VisualShader
+			
+			if use_alpha:
+				mat.set_shader_param("use_alpha", true)
 
-		if model.rom_objs[index].obj_flags & Constants.Model_Flags.LMAP:
-			var lm_tex = load_texture(model, lm_index, ['no_log'])
-			mat.set_shader_param("lm_texture", lm_tex)
+			mat.set_shader_param("main_texture", img_tex)
+
+			if model.rom_objs[index].obj_flags & Constants.Model_Flags.LMAP:
+				var lm_tex = load_texture(model, lm_index, ['no_log'])
+				mat.set_shader_param("lm_texture", lm_tex)
+			# End If
+		# End If
+	# End If
 
 
 		mesh_instance.set_surface_material(0, mat)
@@ -161,6 +174,10 @@ func load_mesh(model, index, rom_skeleton = null):
 # End Func
 
 func load_texture(model, index, options = []):
+	if index > model.rom_texs.size()-1 :
+		print("[LoadTexture] Unknown texture index (%d), returning null" % index)
+		return null
+	
 	var file_path = ui_controller.loaded_path
 	var extension = ui_controller.loaded_extension
 	var model_item = model.rom_texs[index]

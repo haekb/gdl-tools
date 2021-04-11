@@ -10,6 +10,8 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	if !no_log:
 		print("Building %s" % name)
 	var st = SurfaceTool.new()
+	
+	# GDL uses Triangle strips - check cxbx on how the data is formatted
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	
 	var obj_vertices = obj_data.vertices[sub_obj_index]
@@ -35,8 +37,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	#var p1 = 0
 	#var p2 = 1
 	
-	var flip = true
-
+	var flip = false
 
 	for i in range(len(obj_vertices)):
 		if i < 2:
@@ -45,21 +46,23 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		var p1 = i - 2
 		var p2 = i - 1
 		var p3 = i
-		
 		var front_face = obj_unk_vec2[p3][0] == 1.0
+		var cull_cw = !front_face
 		
 		if !obj_skip_vertices[p3].skip:
-			if front_face:
+			# Clockwise
+			if !cull_cw:
+				if flip:
+					indexes.append([p1, p2, p3])
+				else:
+					indexes.append([p2, p1, p3])
+				# End If
+			# Counter-Clockwise
+			else:
 				if flip:
 					indexes.append([p1, p3, p2])
 				else:
 					indexes.append([p1, p2, p3])
-				# End If
-			else:
-				if flip:
-					indexes.append([p3, p2, p1])
-				else:
-					indexes.append([p3, p1, p2])
 				# End If
 
 			flip = not flip
@@ -148,7 +151,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	
 	# Clean up normals
 	# Note: Normals are inside out because MeshView Scale.X is -1 to match GDL
-	st.generate_normals(false)
+	st.generate_normals(true)
 	
 	var mesh_array = st.commit()
 	

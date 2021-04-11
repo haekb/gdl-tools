@@ -1,7 +1,8 @@
 class Texture_4_A_4:
-	static func process(data, width, height, flags):
+	static func process(data, width, height, flags, options = []):
 		var data_len = len(data)
 		var image_data = []
+		var alpha_as_albedo = "alpha_as_albedo" in options
 		
 		var working_width = width / 2
 		var working_height = height / 2
@@ -28,15 +29,25 @@ class Texture_4_A_4:
 				first_pixel *= 16
 				second_pixel *= 16
 	
-				image_data.append(255)
-				image_data.append(255)
-				image_data.append(255)
-				image_data.append(first_pixel)
-				
-				image_data.append(255)
-				image_data.append(255)
-				image_data.append(255)
-				image_data.append(second_pixel)
+				if alpha_as_albedo:
+					image_data.append(first_pixel)
+					image_data.append(first_pixel)
+					image_data.append(first_pixel)
+					image_data.append(255)
+					image_data.append(second_pixel)
+					image_data.append(second_pixel)
+					image_data.append(second_pixel)
+					image_data.append(255)
+				else:
+					image_data.append(255)
+					image_data.append(255)
+					image_data.append(255)
+					image_data.append(first_pixel)
+					
+					image_data.append(255)
+					image_data.append(255)
+					image_data.append(255)
+					image_data.append(second_pixel)
 			# End For
 			if repeated_line:
 				y += 1

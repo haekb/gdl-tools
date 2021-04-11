@@ -9,9 +9,9 @@ class Processors:
 		Constants.Tex_Formats.UNK_DREAMCAST: load('res://Src/Processors/texture_unk_dreamcast.gd').Texture_Unk_Dreamcast,
 	}
 	
-	func process(data, width, height, flags, format):
+	func process(data, width, height, flags, format, options = []):
 		if format in self.processors:
-			return self.processors[format].process(data, width, height, flags)
+			return self.processors[format].process(data, width, height, flags, options)
 		# End If
 		print("Format %s is not yet supported!" % Helpers.get_texture_format_string(format))
 		return []

@@ -44,7 +44,7 @@ class Texture_Unk_Dreamcast:
 		return mip_count
 	# End Func
 	
-	static func process(data, width, height, flags):
+	static func process(data, width, height, flags, options = []):
 		var data_len = len(data)
 		var image_data = []
 		

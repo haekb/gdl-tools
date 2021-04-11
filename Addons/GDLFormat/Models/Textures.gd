@@ -20,14 +20,14 @@ class TextureFormat:
 			
 		return value
 	
-	static func cast(data, width, height, flags, format):
+	static func cast(data, width, height, flags, format, options = []):
 		var return_data = []
 		
 		print("Format: %s" % Helpers.get_texture_format_string(format))
 		
 		var processors = load('res://Src/Processors/processors.gd').Processors.new()
 		
-		return_data = processors.process(data, width, height, flags, format)
+		return_data = processors.process(data, width, height, flags, format, options)
 		
 		var image = Image.new()
 		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
@@ -43,7 +43,7 @@ class Textures:
 	var image = null
 	var format = null
 	
-	func read_texture(f : File, width, height, flags, pformat):
+	func read_texture(f : File, width, height, flags, pformat, options = []):
 		var read_width = width
 		var read_height = height
 		var bytes = 1
@@ -84,7 +84,7 @@ class Textures:
 			# End For
 		# End If
 
-		var tex_data_rgb888a = TextureFormat.cast(tex_data, width, height, flags, pformat)
+		var tex_data_rgb888a = TextureFormat.cast(tex_data, width, height, flags, pformat, options)
 		
 #		var image = Image.new()
 #		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, tex_data_rgb888a)
@@ -95,7 +95,7 @@ class Textures:
 		return tex_data_rgb888a
 	# End Func
 
-	func read(f : File, rom_tex):
+	func read(f : File, rom_tex, options = []):
 		var size = rom_tex.size
 		var width = rom_tex.width
 		var height = rom_tex.height
@@ -104,11 +104,12 @@ class Textures:
 		
 		f.seek(rom_tex.tex_data_pointer)
 		
-		var string_flags = Helpers.get_texture_flag_string(flags)
-		print("Texture Flags: ", string_flags)
+		if !("no_log" in options):
+			var string_flags = Helpers.get_texture_flag_string(flags)
+			print("Texture Flags: ", string_flags)
 		
 		self.format = lformat
-		self.image = read_texture(f, width, height, flags, lformat)
+		self.image = read_texture(f, width, height, flags, lformat, options)
 		
 		return Helpers.make_response(Helpers.IMPORT_RETURN.SUCCESS)
 	# End Func

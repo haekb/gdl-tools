@@ -1,5 +1,5 @@
 class Texture_8_A_8:
-	static func process(data, width, height, flags):
+	static func process(data, width, height, flags, options = []):
 		var data_len = len(data)
 		var image_data = []
 		

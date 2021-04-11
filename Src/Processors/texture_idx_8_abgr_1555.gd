@@ -37,7 +37,7 @@ class Texture_IDX_8_ABGR_1555:
 		return new_palette
 	
 	
-	static func process(data, width, height, flags):
+	static func process(data, width, height, flags, options = []):
 		var data_len = len(data)
 		var image_data = []
 		var palette = []

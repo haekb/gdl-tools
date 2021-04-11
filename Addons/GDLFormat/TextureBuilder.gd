@@ -30,7 +30,7 @@ func build(source_file, rom_tex, options):
 	# Model as in MVC model, not mesh model!
 	var model = tex_file.Textures.new()
 	
-	var response = model.read(file, rom_tex)
+	var response = model.read(file, rom_tex, options)
 	self.model = model
 	
 	file.close()
