@@ -316,10 +316,8 @@ class Objects:
 					var x = Helpers.utsi(f.get_32())
 					var y = Helpers.utsi(f.get_32())
 					var z = Helpers.utsi(f.get_32())
-					var scale = 1 / 0xFFFF
 					
 					self.vector = Vector3( x, y, z )
-					self.vector *= scale
 				else: # Unknown!
 					var x = Helpers.utsb(f.get_8())
 					var y = Helpers.utsb(f.get_8())
