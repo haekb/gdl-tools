@@ -29,6 +29,9 @@ class TextureFormat:
 		
 		return_data = processors.process(data, width, height, flags, format, options)
 		
+		if !return_data:
+			return null
+		
 		var image = Image.new()
 		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
 		

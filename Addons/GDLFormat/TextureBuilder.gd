@@ -40,7 +40,7 @@ func build(source_file, rom_tex, tex_index, options):
 	
 	file.close()
 	
-	if response.code == Helpers.IMPORT_RETURN.ERROR:
+	if model.image == null or response.code == Helpers.IMPORT_RETURN.ERROR:
 		print("IMPORT ERROR: %s" % response.message)
 		return null
 		

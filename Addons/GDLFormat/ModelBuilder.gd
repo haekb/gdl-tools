@@ -3,6 +3,7 @@ extends Node
 func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var no_log = "no_log" in options
 	var show_time = "show_time" in options 
+	var scale_mesh = "scale_mesh" in options
 	
 	var start = OS.get_ticks_msec()
 	var end = OS.get_ticks_msec()
@@ -20,7 +21,11 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var obj_unk_vec2 = obj_data.unk_vec2[sub_obj_index]
 	var obj_vertex_colour = obj_data.vertex_colours[sub_obj_index]
 	
+	var mesh_scale = 1.0
 	
+	# GDL needs to be scaled waaaay down!
+	if scale_mesh:
+		mesh_scale = Constants.Mesh_Scale
 	
 	var vertices = []
 	var uvs = []
@@ -39,34 +44,54 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	
 	var flip = false
 
-	for i in range(len(obj_vertices)):
-		if i < 2:
-			continue
-			
-		var p1 = i - 2
-		var p2 = i - 1
-		var p3 = i
-		var front_face = obj_unk_vec2[p3][0] == 1.0
-		var cull_cw = !front_face
+# GL?
+	for i in range(len(obj_skip_vertices)):
+		var vi = obj_skip_vertices[i].normal
 		
-		if !obj_skip_vertices[p3].skip:
-			# Clockwise
-			if !cull_cw:
-				if flip:
-					indexes.append([p1, p2, p3])
-				else:
-					indexes.append([p2, p1, p3])
-				# End If
-			# Counter-Clockwise
-			else:
-				if flip:
-					indexes.append([p1, p3, p2])
-				else:
-					indexes.append([p1, p2, p3])
-				# End If
+		var i0 = int(vi.x)
+		var i1 = int(vi.y)
+		var i2 = int(vi.z)
+		
+		var x = obj_vertices[i0]
+		var y = obj_vertices[i1]
+		var z = obj_vertices[i2]
+		
+		indexes.append(i0)
+		indexes.append(i1)
+		indexes.append(i2)
 
-			flip = not flip
-		# End If
+# GDL
+#	for i in range(len(obj_vertices)):
+#		if i < 2:
+#			continue
+#
+#		var p1 = i - 2
+#		var p2 = i - 1
+#		var p3 = i
+#		var front_face = obj_unk_vec2[p3][0] == 1.0
+#		var cull_cw = !front_face
+#
+#		# HACK!
+#
+#
+#		if !obj_skip_vertices[p3].skip:
+#			# Clockwise
+#			if !cull_cw:
+#				if flip:
+#					indexes.append([p1, p2, p3])
+#				else:
+#					indexes.append([p2, p1, p3])
+#				# End If
+#			# Counter-Clockwise
+#			else:
+#				if flip:
+#					indexes.append([p1, p3, p2])
+#				else:
+#					indexes.append([p1, p2, p3])
+#				# End If
+#
+#			flip = not flip
+#		# End If
 
 #	for p3 in range(2, len(obj_vertices)):
 #		var front_face = obj_unk_vec2[p3][0] == 1.0
@@ -145,8 +170,8 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		if len(obj_vertex_colour) > 0:
 			st.add_color(obj_vertex_colour[i].colour)
 		
-		st.add_normal(obj_skip_vertices[i].normal)
-		st.add_vertex(obj_vertices[i].vector * Constants.Mesh_Scale)
+		#st.add_normal(obj_skip_vertices[i].normal)
+		st.add_vertex(obj_vertices[i].vector * mesh_scale)
 	# End For
 	
 	# Clean up normals

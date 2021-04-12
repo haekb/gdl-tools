@@ -97,9 +97,14 @@ func load_mesh(model, index, rom_skeleton = null):
 	
 	var meshes = []
 	
+	var options = ['no_log']
+	
+	if extension.to_lower() == "ps2":
+		options.append("scale_mesh")
+	
 	#print("Generating %d meshes..." % len(obj_data.vertices))
 	for i in range(len(obj_data.vertices)):
-		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, rom_skeleton, ['no_log'])
+		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, rom_skeleton, options)
 		var mesh_instance = MeshInstance.new()
 		
 		mesh_instance.name = "%s - %d" % [obj_def.name, i]
@@ -126,6 +131,9 @@ func load_mesh(model, index, rom_skeleton = null):
 		
 		var use_custom_shader = true
 		var mat = null
+		
+		if !img_tex:
+			img_tex = load('res://Textures/missing.png')
 		
 		# Use spatial material - Not great support for lightmaps
 		if !use_custom_shader:
