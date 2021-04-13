@@ -42,56 +42,90 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	#var p1 = 0
 	#var p2 = 1
 	
-	var flip = false
+	var flip = true
+	var flip_stick_counter = 0
+	var first_run = false
 
-# GL?
-	for i in range(len(obj_skip_vertices)):
-		var vi = obj_skip_vertices[i].normal
-		
-		var i0 = int(vi.x)
-		var i1 = int(vi.y)
-		var i2 = int(vi.z)
-		
-		var x = obj_vertices[i0]
-		var y = obj_vertices[i1]
-		var z = obj_vertices[i2]
-		
-		indexes.append(i0)
-		indexes.append(i1)
-		indexes.append(i2)
-
-# GDL
-#	for i in range(len(obj_vertices)):
-#		if i < 2:
-#			continue
-#
-#		var p1 = i - 2
-#		var p2 = i - 1
-#		var p3 = i
-#		var front_face = obj_unk_vec2[p3][0] == 1.0
-#		var cull_cw = !front_face
-#
-#		# HACK!
-#
-#
-#		if !obj_skip_vertices[p3].skip:
-#			# Clockwise
-#			if !cull_cw:
-#				if flip:
-#					indexes.append([p1, p2, p3])
+	if !scale_mesh:
+		flip = false
+		# GL?
+		var skipper = 0
+		for i in range(len(obj_skip_vertices)):
+			# We duplicate normals to match vert count for later...it sucks but ehh
+			if skipper < 2:
+				skipper += 1
+				continue
+			else:
+				skipper = 0
+				
+			# Index list is packed into normal for now...
+			var vi = obj_skip_vertices[i].indexes
+			var skip = obj_skip_vertices[i].skip
+			var byte1 = obj_skip_vertices[i].byte_1
+			var byte2 = obj_skip_vertices[i].byte_2
+			
+			var x = obj_vertices[vi[0]]
+			var y = obj_vertices[vi[1]]
+			var z = obj_vertices[vi[2]]
+			
+			
+#			if first_run:
+#				if byte2 == 0xC0:
+#					flip = true
 #				else:
-#					indexes.append([p2, p1, p3])
-#				# End If
-#			# Counter-Clockwise
+#					flip = false
+#				first_run = false
+			
+#			if skip != 0:
+#				flip = true
 #			else:
-#				if flip:
-#					indexes.append([p1, p3, p2])
-#				else:
-#					indexes.append([p1, p2, p3])
-#				# End If
-#
-#			flip = not flip
-#		# End If
+#				flip = false
+			
+
+			if flip:
+				indexes.append([vi[0], vi[1], vi[2]])
+			else:
+				indexes.append([vi[0], vi[2], vi[1]])
+				
+			flip = not flip
+			
+			var hello = true
+			
+			
+
+			
+
+	else:
+		# GDL
+		for i in range(len(obj_vertices)):
+			if i < 2:
+				continue
+
+			var p1 = i - 2
+			var p2 = i - 1
+			var p3 = i
+			var front_face = obj_unk_vec2[p3][0] == 1.0
+			var cull_cw = !front_face
+
+			# HACK!
+			if !obj_skip_vertices[p3].skip:
+				# Clockwise
+				if !cull_cw:
+					if flip:
+						indexes.append([p1, p2, p3])
+					else:
+						indexes.append([p2, p1, p3])
+					# End If
+				# Counter-Clockwise
+				else:
+					if flip:
+						indexes.append([p1, p3, p2])
+					else:
+						indexes.append([p1, p2, p3])
+					# End If
+
+				flip = not flip
+			# End If
 
 #	for p3 in range(2, len(obj_vertices)):
 #		var front_face = obj_unk_vec2[p3][0] == 1.0
@@ -170,13 +204,14 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 		if len(obj_vertex_colour) > 0:
 			st.add_color(obj_vertex_colour[i].colour)
 		
-		#st.add_normal(obj_skip_vertices[i].normal)
+		#if mesh_scale:
+		st.add_normal(obj_skip_vertices[i].normal)
 		st.add_vertex(obj_vertices[i].vector * mesh_scale)
 	# End For
 	
 	# Clean up normals
 	# Note: Normals are inside out because MeshView Scale.X is -1 to match GDL
-	st.generate_normals(true)
+	#st.generate_normals(true)
 	
 	var mesh_array = st.commit()
 	

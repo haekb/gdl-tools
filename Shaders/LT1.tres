@@ -39,7 +39,7 @@ uniform_name = "use_alpha"
 
 [resource]
 code = "shader_type spatial;
-render_mode cull_disabled, diffuse_burley, specular_schlick_ggx, vertex_lighting;
+render_mode diffuse_burley, specular_schlick_ggx, vertex_lighting;
 
 uniform sampler2D main_texture;
 uniform sampler2D lm_texture;
@@ -99,8 +99,6 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -657, -45 )
-modes/cull = 2
 modes/diffuse = 3
 flags/vertex_lighting = true
 nodes/fragment/0/position = Vector2( 400, 0 )

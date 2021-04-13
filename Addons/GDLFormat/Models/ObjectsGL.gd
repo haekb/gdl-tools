@@ -326,14 +326,32 @@ class Objects:
 			var byte_2 = 0
 			var skip = false
 			var normal = Vector3()
+			var indexes = []
 			
 			func read(f : File):
-				var x = float(Helpers.utsh(f.get_16()))# / 128.0
-				var y = float(Helpers.utsh(f.get_16()))# / 128.0
-				var z = float(Helpers.utsh(f.get_16()))# / 128.0
-				self.normal = Vector3( x, y, z )
+				var x = Helpers.utsh(f.get_16())# / 128.0
+				var y = Helpers.utsh(f.get_16())# / 128.0
+				var z = Helpers.utsh(f.get_16())# / 128.0
+				#self.normal = Vector3( x, y, z )
+				self.indexes = [x,y,z]
 				
-				self.byte_1 = f.get_16()
+				#self.byte_1 = f.get_8()
+				#self.byte_2 = f.get_8()
+				
+				var packed_normal = f.get_16()
+				#self.byte_1 = packed_normal
+				#self.packed_short = packed_normal
+				var nx = ((packed_normal & 0x1f) - 0xf) * Constants.Normal_Scale
+				var ny = (((packed_normal >> 5) & 0xf) - 0xf) * Constants.Normal_Scale
+				var nz = (((packed_normal >> 10) & 0xf) - 0xf) * Constants.Normal_Scale
+				self.normal = Vector3(x,y,z)
+				
+				f.seek(f.get_position() - 2)
+				
+				self.byte_1 = f.get_8()
+				self.byte_2 = f.get_8()
+				
+				self.skip = packed_normal >> 15
 			# End Func
 		# End Class
 
