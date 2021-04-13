@@ -24,7 +24,7 @@ func build(source_file, options):
 	var response = null
 	
 	# Gauntlet Legends (Dreamcast)
-	if version == 0xF00B0001:
+	if version == 0 or version == 0xF00B0001:
 		var path = "%s/Models/ObjectsGL.gd" % self.get_script().get_path().get_base_dir()
 		var obj_file = load(path)
 		model = obj_file.Objects.new()
