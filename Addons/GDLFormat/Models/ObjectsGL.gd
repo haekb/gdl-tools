@@ -2,6 +2,8 @@ extends Node
 
 class Objects:
 	
+	var platform = "dc"
+	
 	var dir_name = ""
 	var model_name = ""
 	var version = 0
@@ -206,28 +208,7 @@ class Objects:
 	# End Class
 	
 	class RomTex:
-		
-		enum Formats {
-			ABGR_1555 = 0,
-			BGR_555 = 1,
-			ABGR_8888 = 2,
-			BGR_888 = 3,
-			IDX_4_ABGR_1555 = 16,
-			IDX_4_BGR_555 = 17,
-			IDX_4_ABGR_8888 = 34,
-			IDX_4_BGR_888 = 35,
-			IDX_8_ABGR_1555 = 48,
-			IDX_8_BGR_555 = 49,
-			IDXA_88 = 56,
-			IDX_8_ABGR_8888 = 66,
-			IDX_8_BGR_888 = 67,
-			IDX_8_A_8 = 130,
-			IDX_8_I_8 = 131,
-			IDX_4_A_4 = 146,
-			IDX_4_I_4 = 147
-			
-			END = 255
-		}
+		var platform = "dc"
 		
 		var format = 0
 		var lodk = 0
@@ -272,8 +253,10 @@ class Objects:
 			self.attributes = f.get_32()
 			self.size = f.get_32()
 			
+			
+			
 			# Override for now...
-			self.format = Constants.Tex_Formats.UNK_DREAMCAST
+			self.format = Constants.DC_Tex_Formats.RGB_565
 			
 			#self.flags = [
 			#	(self.attributes >> 8) & 0xFF, # Texture Attributes

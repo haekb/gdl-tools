@@ -39,10 +39,11 @@ uniform_name = "use_alpha"
 
 [resource]
 code = "shader_type spatial;
-render_mode diffuse_burley, specular_schlick_ggx, vertex_lighting;
+render_mode depth_draw_alpha_prepass, cull_disabled, diffuse_burley, specular_schlick_ggx, vertex_lighting;
 
 uniform sampler2D main_texture;
 uniform sampler2D lm_texture;
+uniform bool use_alpha;
 
 
 
@@ -89,8 +90,31 @@ void fragment() {
 // VectorOp:6
 	vec3 n_out6p0 = n_out11p0 * n_out8p0;
 
+// BooleanUniform:9
+	bool n_out9p0 = use_alpha;
+
+// If:10
+	float n_in10p1 = 1.00000;
+	float n_in10p2 = 0.00100;
+	vec3 n_in10p4 = vec3(1.00000, 1.00000, 1.00000);
+	vec3 n_in10p5 = vec3(1.00000, 1.00000, 1.00000);
+	vec3 n_out10p0;
+	if(abs((n_out9p0 ? 1.0 : 0.0) - n_in10p1) < n_in10p2)
+	{
+		n_out10p0 = vec3(n_out2p1);
+	}
+	else if((n_out9p0 ? 1.0 : 0.0) < n_in10p1)
+	{
+		n_out10p0 = n_in10p5;
+	}
+	else
+	{
+		n_out10p0 = n_in10p4;
+	}
+
 // Output:0
 	ALBEDO = n_out6p0;
+	ALPHA = dot(n_out10p0, vec3(0.333333, 0.333333, 0.333333));
 
 }
 
@@ -99,6 +123,9 @@ void light() {
 
 }
 "
+graph_offset = Vector2( -671, -271.5 )
+modes/cull = 2
+modes/depth_draw = 3
 modes/diffuse = 3
 flags/vertex_lighting = true
 nodes/fragment/0/position = Vector2( 400, 0 )
@@ -122,4 +149,4 @@ nodes/fragment/10/node = SubResource( 1 )
 nodes/fragment/10/position = Vector2( -400, -60 )
 nodes/fragment/11/node = SubResource( 2 )
 nodes/fragment/11/position = Vector2( -340, 180 )
-nodes/fragment/connections = PoolIntArray( 9, 0, 10, 0, 2, 1, 10, 3, 3, 0, 2, 0, 2, 0, 11, 0, 7, 0, 11, 1, 11, 0, 6, 0, 8, 0, 6, 1, 4, 0, 5, 0, 5, 1, 8, 0, 6, 0, 0, 0 )
+nodes/fragment/connections = PoolIntArray( 9, 0, 10, 0, 2, 1, 10, 3, 3, 0, 2, 0, 2, 0, 11, 0, 7, 0, 11, 1, 11, 0, 6, 0, 8, 0, 6, 1, 4, 0, 5, 0, 5, 1, 8, 0, 6, 0, 0, 0, 10, 0, 0, 1 )

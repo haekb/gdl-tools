@@ -211,7 +211,7 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	
 	# Clean up normals
 	# Note: Normals are inside out because MeshView Scale.X is -1 to match GDL
-	#st.generate_normals(true)
+	st.generate_normals(true)
 	
 	var mesh_array = st.commit()
 	

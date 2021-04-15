@@ -2,6 +2,8 @@ extends Node
 
 class Objects:
 	
+	var platform = "ps2"
+	
 	var dir_name = ""
 	var model_name = ""
 	var version = 0
@@ -227,6 +229,8 @@ class Objects:
 			
 			END = 255
 		}
+		
+		var platform = "ps2"
 		
 		var format = 0
 		var lodk = 0
