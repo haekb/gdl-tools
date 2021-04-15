@@ -1,4 +1,4 @@
-class Texture_Unk_Dreamcast:
+class Texture_565:
 	const TWIDDLE_TABLE_SIZE = 1024
 	
 	static func untwiddle_value(value):
@@ -44,19 +44,37 @@ class Texture_Unk_Dreamcast:
 		return mip_count
 	# End Func
 	
-	static func process(data, width, height, flags, options = []):
+	static func process(data, rom_tex, options = []):
+		var width = rom_tex.width
+		var height = rom_tex.height
+		var flags = rom_tex.flags
+		var attributes = rom_tex.attributes
+		
 		var data_len = len(data)
 		var image_data = []
 		
 		for _i in range(width * height * 4):
 			image_data.append(0)
 		# End For
-		
-		var has_mipmaps = Constants.DC_Tex_Attributes.Twiddled_MipMaps
+
 		var mipmaps = 1
-		
-		var is_twiddled = Constants.DC_Tex_Attributes.Twiddled || Constants.DC_Tex_Attributes.Twiddled_MipMaps || Constants.DC_Tex_Attributes.Twiddled_Non_Square
+		var has_mipmaps = false
+		var is_twiddled = false
 		var is_compressed = false
+
+		if attributes & Constants.DC_Tex_Attributes.TWIDDLED:
+			is_twiddled = true
+		elif attributes & Constants.DC_Tex_Attributes.TWIDDLED_MM:
+			is_twiddled = true
+			has_mipmaps = true
+		elif attributes & Constants.DC_Tex_Attributes.PALETTIZE4_MM:
+			has_mipmaps = true
+		elif attributes & Constants.DC_Tex_Attributes.PALETTIZE8_MM:
+			has_mipmaps = true
+		elif attributes & Constants.DC_Tex_Attributes.TWIDDLED_RECTANGLE:
+			is_twiddled = true
+		elif attributes & Constants.DC_Tex_Attributes.TWIDDLED_MM_ALIAS:
+			is_twiddled = true
 		
 		if has_mipmaps:
 			mipmaps = get_mipmap_count(width)

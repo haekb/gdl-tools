@@ -175,3 +175,11 @@ func read_vector3(f : File):
 func seek_ahead(amount, f : File):
 	f.seek(f.get_position() + amount)
 # End If
+
+# From: https://stackoverflow.com/a/3124978
+func flip_byte(x):
+	var nibble1 = (x & 0x0F)
+	var nibble2 = ((x & 0xF0) >> 4)
+
+	# Flip those numbers!
+	return ((nibble1 << 4) | nibble2)

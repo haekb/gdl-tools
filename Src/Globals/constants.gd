@@ -1,18 +1,36 @@
 extends Node
 
+# Thanks https://www.pioneer2.net/community/threads/pso-dev-wiki-staging-thread.14913/page-2#post-129046
 enum DC_Tex_Attributes {
-	Twiddled = 1,
-	Twiddled_MipMaps = 2,
-	Vector_Quantized = 3,
-	Vector_Quantized_MipMaps = 4
-	Vector_Quantized_Custom_Codebook = 16
-	Vector_Quantized_Custom_Codebook_MipMaps = 17
-	Raw = 11,
-	Raw_Non_Square = 12,
-	Twiddled_Non_Square = 13,
+	TWIDDLED           = 0x01,
+	TWIDDLED_MM        = 0x02,
+	VQ                 = 0x03,
+	VQ_MM              = 0x04,
+	PALETTIZE4         = 0x05,
+	PALETTIZE4_MM      = 0x06,
+	PALETTIZE8         = 0x07,
+	PALETTIZE8_MM      = 0x08,
+	RECTANGLE          = 0x09,
+	STRIDE             = 0x0B,
+	TWIDDLED_RECTANGLE = 0x0D,
+	ABGR               = 0x0E,
+	ABGR_MM            = 0x0F,
+	SMALLVQ            = 0x10,
+	SMALLVQ_MM         = 0x11,
+	TWIDDLED_MM_ALIAS  = 0x12,
 }
 
-# Texture Formats
+enum DC_Tex_Formats {
+	ARGB_1555          = 0x00,
+	RGB_565            = 0x01,
+	ARGB_4444          = 0x02,
+	YUV_422            = 0x03,
+	BUMP               = 0x04,
+	RGB_555            = 0x05,
+	YUV_420            = 0x06,
+}
+
+# Texture Formats (GDL)
 enum Tex_Formats {
 	ABGR_1555 = 0,
 	BGR_555 = 1,
@@ -31,12 +49,6 @@ enum Tex_Formats {
 	IDX_8_I_8 = 131,
 	IDX_4_A_4 = 146,
 	IDX_4_I_4 = 147,
-	
-	END_PS2 = 255,
-	
-	# Outside of the char range
-	
-	UNK_DREAMCAST = 256,
 }
 
 enum Tex_Flags {

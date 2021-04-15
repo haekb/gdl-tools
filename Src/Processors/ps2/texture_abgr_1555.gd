@@ -1,5 +1,9 @@
 class Texture_ABGR_1555:
-	static func process(data, width, height, flags, options = []):
+	static func process(data, rom_tex, options = []):
+		var width = rom_tex.width
+		var height = rom_tex.height
+		var flags = rom_tex.flags
+		
 		var data_len = len(data)
 		var image_data = []
 		
