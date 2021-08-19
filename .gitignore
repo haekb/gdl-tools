@@ -1,1 +1,3 @@
 .import
+bin/*
+exported_scene.*
