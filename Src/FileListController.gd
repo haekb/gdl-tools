@@ -80,7 +80,7 @@ func load_anim(anim_model, obj_model, index):
 	anim_root.add_child(anim_player)
 	anim_player.owner = anim_root
 	
-	anim_player.play("Test")
+	#anim_player.play("Test")
 	
 	return anim_root
 
@@ -173,8 +173,7 @@ func load_mesh(model, index, rom_skeleton = null):
 			# End If
 		# End If
 	# End If
-
-
+	
 		mesh_instance.set_surface_material(0, mat)
 		meshes.append(mesh_instance)
 	

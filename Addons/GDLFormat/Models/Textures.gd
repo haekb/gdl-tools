@@ -30,8 +30,8 @@ class Textures:
 				read += 1024
 			elif pformat == Constants.Tex_Formats.IDX_8_ABGR_1555:
 				read += 512
-			elif pformat == Constants.Tex_Formats.UNK_DREAMCAST:
-				read *= 2
+			#elif pformat == Constants.Tex_Formats.UNK_DREAMCAST:
+			#	read *= 2
 				
 			if pformat == Constants.Tex_Formats.ABGR_1555:
 				# Two bytes per pixel
@@ -48,7 +48,7 @@ class Textures:
 				# End For
 			# End If
 		else:
-					
+			read = size/2
 			for _i in range(read):
 				tex_data.append(f.get_16())
 			# End For
@@ -64,8 +64,8 @@ class Textures:
 		if !return_data:
 			return null
 		
-		#var image = Image.new()
-		#image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
+		var image = Image.new()
+		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, return_data)
 		
 		
 #		var image = Image.new()
@@ -74,7 +74,7 @@ class Textures:
 		
 		
 		
-		return return_data
+		return image
 	# End Func
 
 	func read(f : File, rom_tex, options = []):

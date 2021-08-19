@@ -32,9 +32,9 @@ func build(name, rom_obj, obj_data, sub_obj_index, bone = null, options = []):
 	var indexes = []
 	var normals = []
 	
-	#if !no_log:
-	var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
-	print("Object Flags: ", flags)
+	if !no_log:
+		var flags = Helpers.get_model_flag_string(rom_obj.obj_flags)
+		print("Object Flags: ", flags)
 	
 	var has_lightmaps = rom_obj.obj_flags & Constants.Model_Flags.LMAP
 	

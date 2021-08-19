@@ -102,6 +102,9 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 	
 	if len(skeleton.data.animations) == 0:
 		return anim_player
+		
+	if len(skeleton.data.animation_headers) == 0:
+		return anim_player
 	
 	# Loop through sequences...
 	var sequence_index = 0
@@ -125,6 +128,9 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		
 		var meshes = []
 		
+		#if bone.mb_flags == 32768:
+		#	continue
+		
 		for child in godot_skeleton.get_parent().get_children():
 			if bone.name in child.name:
 				meshes.append(child)
@@ -137,7 +143,13 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 		anim.track_set_path(track_id, key)
 		#anim.track_set_interpolation_type(track_id, Animation.INTERPOLATION_NEAREST)
 		
-		if type & 0x4000:
+		var type_flags = [ 0x1, 0x2, 0x4, 0x10, 0x20, 0x40, 0x100, 0x200, 0x400 ]
+		var type_4000 = type & 0x4000
+		
+		#if type & 0x4000:
+		#	continue
+		
+		if ! type_4000:
 			continue
 		
 		var last_rotation = Vector3()
@@ -150,11 +162,34 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 			var rotation  = sequence.rotations[frame]#Quat(mesh.rotation + sequence.rotations[frame])
 			var scale = sequence.scales[frame]
 			
+			# Weird defaults
+			if type_4000:
+				if type & type_flags[0] == 0:
+					rotation.x = 0
+				if type & type_flags[4] == 0:
+					rotation.y = 0
+				if type & type_flags[8] == 0:
+					rotation.z = 0
+					
+				if type & type_flags[3] == 0:
+					translation.x = 0
+				if type & type_flags[5] == 0:
+					translation.y = 0
+				if type & type_flags[6] == 0:
+					translation.z = 0
+				
+				if type & type_flags[6] == 0:
+					scale.x = 1.0
+				if type & type_flags[7] == 0:
+					scale.y = 1.0
+				if type & type_flags[8] == 0:
+					scale.z = 1.0
+			
 			rotation.x = rad2deg(rotation.x)
 			rotation.y = rad2deg(rotation.y)
 			rotation.z = rad2deg(rotation.z)
 			
-			if frame > 0:
+			if !type_4000 && frame > 0:
 				var interp_rotation = get_pyr_interp(frac, rotation, last_rotation)
 				rotation = interp_rotation
 
@@ -181,6 +216,7 @@ func process_animations(model, index, godot_skeleton : Skeleton, anim_player : A
 	
 	return anim_player
 
+# PITCH YAW ROLL
 func get_pyr_interp(fraction, rotation_a, rotation_b):
 	var interp_rotation = Vector3()
 	

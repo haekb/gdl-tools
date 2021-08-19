@@ -21,19 +21,6 @@ class Texture_565:
 		
 		return pos
 	
-	static func process2(data, width, height, flags):
-		var data_len = len(data)
-		var image_data = []
-		
-		var image = Image.new()
-		image.create_from_data(width, height, false, Image.FORMAT_RGB8, data)
-		image.save_png("./dreamcast.png")
-		
-		return image
-		
-		#while i < data_len - 2:
-		#	image_data.append(data[i])
-	
 	static func get_mipmap_count(width):
 		var current_width = width
 		var mip_count = 0
@@ -61,15 +48,22 @@ class Texture_565:
 		var has_mipmaps = false
 		var is_twiddled = false
 		var is_compressed = false
+		var palette_size = 0
 
 		if attributes & Constants.DC_Tex_Attributes.TWIDDLED:
 			is_twiddled = true
 		elif attributes & Constants.DC_Tex_Attributes.TWIDDLED_MM:
 			is_twiddled = true
 			has_mipmaps = true
+		elif attributes & Constants.DC_Tex_Attributes.PALETTIZE4:
+			palette_size = 8
 		elif attributes & Constants.DC_Tex_Attributes.PALETTIZE4_MM:
+			palette_size = 4
 			has_mipmaps = true
+		elif attributes & Constants.DC_Tex_Attributes.PALETTIZE8:
+			palette_size = 8
 		elif attributes & Constants.DC_Tex_Attributes.PALETTIZE8_MM:
+			palette_size = 8
 			has_mipmaps = true
 		elif attributes & Constants.DC_Tex_Attributes.TWIDDLED_RECTANGLE:
 			is_twiddled = true
@@ -107,7 +101,7 @@ class Texture_565:
 			
 		var x = 0
 		var y = 0
-		var processed = 0
+		var processed = current_pos
 		
 #		# HACK
 #		var packed_shorts = []
@@ -122,53 +116,106 @@ class Texture_565:
 #		# End For
 #		# END HACK
 
-		var src_pos = 0
-		while processed < mip_size:
+		var palette = []
+		if palette_size > 0:
+			var buffer = StreamPeerBuffer.new()
+			buffer.data_array = data
 			
-			var dest_pos = 0
-			var src_texel = 0
+			if palette_size == 4:
+				for p_x in range(16):
+					for p_y in range(16):
+						var pos = get_untwiddled_texel_position(p_x, p_y)
+						
+						buffer.seek(pos)
+						var rgb = Helpers.stub(buffer.get_8())
+						var nibbles = Helpers.split_byte(rgb)
+						palette.append(nibbles[0])
+						palette.append(nibbles[1])
+					# End For
+				# End For
+				buffer.seek(256) # End of palette
+			else:
+				for p_x in range(16):
+					for p_y in range(16):
+						var pos = get_untwiddled_texel_position(p_x, p_y)
+						var rgb = data[pos]
+						palette.append(rgb)
+				# End For
+				buffer.seek(256) # End of palette
+			# End If
 			
-			if !is_compressed:
-				x = processed % mip_width
-				y = processed / mip_width
+			image_data = []
+			while processed < mip_size:
+				var index = Helpers.stub(buffer.get_8())
+				var src_texel = palette[index]
 				
-				if is_twiddled:
-					src_pos = get_untwiddled_texel_position(x, y)
-				# End If
-				
-				
-				src_texel = data[src_pos]
-				
-				if !is_twiddled:
-					src_pos += 1
-
-				# ABGR_1555
-#				var r = src_texel & 0x7C00 >> 7
-#				var g = src_texel & 0x03E0 >> 2
-#				var b = src_texel & 0x001F << 3
-#
-#				var a = 0
-#				if (src_texel & 0x8000):
-#					a = 255
-				# End If
-				
-				# RGB565
 				var a = 255
 				var r = (src_texel & 0xF800) >> 8
 				var g = (src_texel & 0x07E0) >> 3
 				var b = (src_texel & 0x001F) << 3
 				
-				dest_pos = processed * 4
+				image_data.append(r)
+				image_data.append(g)
+				image_data.append(b)
+				image_data.append(a)
 				
-				image_data[dest_pos] = r
-				image_data[dest_pos + 1] = g
-				image_data[dest_pos + 2] = b
-				image_data[dest_pos + 3] = 255
-			# End If
-			
-			processed += 1
-			# End If
-		# End While
+				processed += 1
+		else:
+			var src_pos = 0
+			while processed < mip_size:
+				
+				var dest_pos = 0
+				var src_texel = 0
+				
+				if !is_compressed:
+					x = processed % mip_width
+					y = processed / mip_width
+					
+					if is_twiddled:
+						src_pos = get_untwiddled_texel_position(x, y)
+					# End If
+					
+					# HACK!
+					if (len(data)-1 < src_pos):
+						break
+					
+					if len(palette) > 0:
+						var bytes = Helpers.split_short(palette[src_pos])
+						
+						src_texel = palette[src_pos]
+					else:
+						src_texel = data[src_pos]
+					
+					if !is_twiddled:
+						src_pos += 1
+
+					# ABGR_1555
+	#				var r = src_texel & 0x7C00 >> 7
+	#				var g = src_texel & 0x03E0 >> 2
+	#				var b = src_texel & 0x001F << 3
+	#
+	#				var a = 0
+	#				if (src_texel & 0x8000):
+	#					a = 255
+					# End If
+					
+					# RGB565
+					var a = 255
+					var r = (src_texel & 0xF800) >> 8
+					var g = (src_texel & 0x07E0) >> 3
+					var b = (src_texel & 0x001F) << 3
+					
+					dest_pos = processed * 4
+					
+					image_data[dest_pos] = r
+					image_data[dest_pos + 1] = g
+					image_data[dest_pos + 2] = b
+					image_data[dest_pos + 3] = 255
+				# End If
+				
+				processed += 1
+				# End If
+			# End While
 
 		var image = Image.new()
 		image.create_from_data(width, height, false, Image.FORMAT_RGBA8, image_data)

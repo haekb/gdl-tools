@@ -2,22 +2,22 @@ extends Node
 
 # Thanks https://www.pioneer2.net/community/threads/pso-dev-wiki-staging-thread.14913/page-2#post-129046
 enum DC_Tex_Attributes {
-	TWIDDLED           = 0x01,
-	TWIDDLED_MM        = 0x02,
-	VQ                 = 0x03,
-	VQ_MM              = 0x04,
-	PALETTIZE4         = 0x05,
-	PALETTIZE4_MM      = 0x06,
-	PALETTIZE8         = 0x07,
-	PALETTIZE8_MM      = 0x08,
-	RECTANGLE          = 0x09,
-	STRIDE             = 0x0B,
-	TWIDDLED_RECTANGLE = 0x0D,
-	ABGR               = 0x0E,
-	ABGR_MM            = 0x0F,
-	SMALLVQ            = 0x10,
-	SMALLVQ_MM         = 0x11,
-	TWIDDLED_MM_ALIAS  = 0x12,
+	TWIDDLED           = 0x0100,
+	TWIDDLED_MM        = 0x0200,
+	VQ                 = 0x0300,
+	VQ_MM              = 0x0400,
+	PALETTIZE4         = 0x0500,
+	PALETTIZE4_MM      = 0x0600,
+	PALETTIZE8         = 0x0700,
+	PALETTIZE8_MM      = 0x0800,
+	RECTANGLE          = 0x0900,
+	STRIDE             = 0x0B00,
+	TWIDDLED_RECTANGLE = 0x0D00,
+	ABGR               = 0x0E00,
+	ABGR_MM            = 0x0F00,
+	SMALLVQ            = 0x1000,
+	SMALLVQ_MM         = 0x1100,
+	TWIDDLED_MM_ALIAS  = 0x1200,
 }
 
 enum DC_Tex_Formats {
@@ -94,10 +94,10 @@ enum Model_Flags {
 enum Bone_Types {
 	EMPTY = 0xFFFFFFFF,
 	NULL = 0,
-	SKEL_ANIM = 1
-	OBJ_ANIM = 2
-	TEX_ANIM = 3
-	PSYS_ANIM = 4
+	SKEL_ANIM = 1,
+	OBJ_ANIM = 2,
+	TEX_ANIM = 3,
+	PSYS_ANIM = 4,
 }
 
 const Normal_Scale = 0.06666667

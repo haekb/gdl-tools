@@ -178,8 +178,17 @@ func seek_ahead(amount, f : File):
 
 # From: https://stackoverflow.com/a/3124978
 func flip_byte(x):
-	var nibble1 = (x & 0x0F)
-	var nibble2 = ((x & 0xF0) >> 4)
+	var nibbles = split_byte(x)
 
 	# Flip those numbers!
-	return ((nibble1 << 4) | nibble2)
+	return ((nibbles[0] << 4) | nibbles[1])
+	
+func split_byte(byte):
+	var nibble1 = (byte & 0x0f)
+	var nibble2 = (byte & 0xf0) >> 4
+	return [nibble1, nibble2]
+
+func split_short(short):
+	var byte1 = short & 0xF;
+	var byte2 = (short >> 4) & 0xF;
+	return [byte1, byte2]
