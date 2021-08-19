@@ -71,13 +71,13 @@ class Texture_IDX_8_ABGR_8888:
 		
 		end = OS.get_ticks_msec()
 		
-		print("Palette loading :", (end-start))
+		#print("Palette loading :", (end-start))
 		start = OS.get_ticks_msec()
 		
 		palette = process_palette(palette)
 		
 		end = OS.get_ticks_msec()
-		print("Palette processing :", (end-start))
+		#print("Palette processing :", (end-start))
 		start = OS.get_ticks_msec()
 		
 		var big_a = 0
@@ -87,7 +87,7 @@ class Texture_IDX_8_ABGR_8888:
 			small_a = min(small_a, item[3])
 
 		end = OS.get_ticks_msec()
-		print("Palette min/max :", (end-start))
+		#print("Palette min/max :", (end-start))
 		start = OS.get_ticks_msec()
 		
 		pos = palette_size
@@ -128,7 +128,7 @@ class Texture_IDX_8_ABGR_8888:
 		# End While
 		
 		end = OS.get_ticks_msec()
-		print("Image assembly :", (end-start))
+		#print("Image assembly :", (end-start))
 
 		return image_data
 	# End Func
