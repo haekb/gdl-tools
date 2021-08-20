@@ -57,12 +57,12 @@ class GLTFExporter:
 		var json_gltf = JSON.print(gltf)
 		
 		var file = File.new()
-		file.open('./exported_scene.gltf', File.WRITE)
+		file.open('./export/exported_scene.gltf', File.WRITE)
 		file.store_string(json_gltf)
 		file.close()
 		
 		file = File.new()
-		file.open('./exported_scene.bin', File.WRITE)
+		file.open('./export/exported_scene.bin', File.WRITE)
 		
 		for mesh_buffer in self.mesh_buffers:
 			file.store_buffer(mesh_buffer.buffer)
@@ -70,6 +70,7 @@ class GLTFExporter:
 		
 		
 		pass
+	
 	
 	func append_buffer_view(length, offset):
 		self.gltf['bufferViews'].append({
@@ -106,6 +107,7 @@ class GLTFExporter:
 	
 	func build_buffers():
 		
+		var current_texture_source = 0
 		var current_buffer_offset = 0
 		var current_accessor_position = 0
 		var total_buffer_size = 0
@@ -116,6 +118,10 @@ class GLTFExporter:
 		self.gltf['bufferViews'] = []
 		self.gltf['accessors'] = []
 		self.gltf['meshes'] = []
+		
+		self.gltf['textures'] = []
+		self.gltf['images'] = []
+		self.gltf['materials'] = []
 		
 		for mesh in self.scene_meshes:
 			
@@ -217,7 +223,7 @@ class GLTFExporter:
 					'buffer': mesh_buffer.data_array
 				})
 				
-				self.gltf['meshes'].append({
+				var meshes_entry = {
 					'name': mesh.name,
 					'primitives': [{
 						'attributes': {
@@ -228,9 +234,59 @@ class GLTFExporter:
 						},
 						'indices': current_accessor_position + 4,
 					}]
-				})
+				}
+				
+				
 				
 				current_accessor_position += 5
+				
+				var mat = mesh.get_surface_material(0) as ShaderMaterial
+
+				var main_tex = mat.get_shader_param('main_texture') as ImageTexture
+				var lm_tex = mat.get_shader_param('lm_texture') as ImageTexture
+				var use_alpha = mat.get_shader_param('use_alpha')
+				
+				var tex_name = "%s.png" % mesh.name
+				
+				if main_tex != null:
+					main_tex.get_data().save_png("./export/%s" % tex_name)
+				if lm_tex != null:
+					lm_tex.get_data().save_png("./export/lm_tex.png")
+					
+				# Skip for now, we should throw the missing_texture.png on these though
+				if main_tex == null:
+					continue
+				
+				self.gltf['textures'].append({
+					'source': current_texture_source
+				})
+				
+				self.gltf['images'].append({
+					'uri': tex_name
+				})
+				
+				self.gltf['materials'].append({
+					'doubleSided': true,
+					#'alphaMode': 'BLEND',
+					'name': "%s - Material" % mesh.name,
+					"pbrMetallicRoughness": {
+						"baseColorFactor": [ 1.0, 1.0, 1.0, 1.0 ],
+						"baseColorTexture": {
+							"index": current_texture_source,
+							#"texCoord": current_accessor_position + 2
+						},
+						"metallicFactor": 0.0,
+						"roughnessFactor": 0.0
+					}
+				})
+				
+				meshes_entry['primitives'][0]['material'] = current_texture_source
+				
+				self.gltf['meshes'].append(meshes_entry)
+				
+				current_texture_source += 1
+				
+				
 				
 		# Append it to the json
 		self.gltf['buffers'] = [ { 'byteLength': total_buffer_size, 'uri': 'exported_scene.bin' } ]

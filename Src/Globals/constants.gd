@@ -102,3 +102,4 @@ enum Bone_Types {
 
 const Normal_Scale = 0.06666667
 const Mesh_Scale = 0.0078125 # 1 / 128
+
