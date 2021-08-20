@@ -47,7 +47,10 @@ class GLTFExporter:
 			'asset': {
 				'generator': "HeyThereCoffeee's GLTF Exporter for GDLTools v0.1",
 				'version': '2.0'
-			}
+			},
+			#'extensionsUsed': [
+			#	'KHR_materials_pbrSpecularGlossiness'
+			#],
 		}
 		
 		build_buffers()
@@ -236,8 +239,6 @@ class GLTFExporter:
 					}]
 				}
 				
-				
-				
 				current_accessor_position += 5
 				
 				var mat = mesh.get_surface_material(0) as ShaderMaterial
@@ -255,6 +256,7 @@ class GLTFExporter:
 					
 				# Skip for now, we should throw the missing_texture.png on these though
 				if main_tex == null:
+					self.gltf['meshes'].append(meshes_entry)
 					continue
 				
 				self.gltf['textures'].append({
@@ -273,13 +275,19 @@ class GLTFExporter:
 						"baseColorFactor": [ 1.0, 1.0, 1.0, 1.0 ],
 						"baseColorTexture": {
 							"index": current_texture_source,
-							#"texCoord": current_accessor_position + 2
 						},
 						"metallicFactor": 0.0,
-						"roughnessFactor": 0.0
-					}
+						"roughnessFactor": 1.0,
+					},
+					# Breaks materials on blender import
+					#'extensions': {
+					#	'KHR_materials_pbrSpecularGlossiness': {
+					#		'glossinessFactor': 0.0,
+					#	}
+					#}
 				})
 				
+				# Apply the material to the mesh
 				meshes_entry['primitives'][0]['material'] = current_texture_source
 				
 				self.gltf['meshes'].append(meshes_entry)
