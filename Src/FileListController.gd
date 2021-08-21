@@ -7,6 +7,9 @@ onready var model_builder = load('res://Addons/GDLFormat/ModelBuilder.gd').new()
 onready var image_viewer = get_node("../../ImageViewer/Image") as TextureRect
 onready var mesh_viewer = get_node("../../../MeshViewer") as Spatial
 
+var cWorldItem = load('res://Src/GDL/WorldItem.gd')
+var cWorldMesh = load('res://Src/GDL/WorldMesh.gd')
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	assert(ui_controller)
@@ -105,7 +108,7 @@ func load_mesh(model, index, rom_skeleton = null):
 	#print("Generating %d meshes..." % len(obj_data.vertices))
 	for i in range(len(obj_data.vertices)):
 		var mesh_array = self.model_builder.build(obj_def.name, model_item, obj_data, i, rom_skeleton, options)
-		var mesh_instance = MeshInstance.new()
+		var mesh_instance = self.cWorldMesh.new()
 		
 		mesh_instance.name = "%s - %d" % [obj_def.name, i]
 		mesh_instance.mesh = mesh_array
@@ -238,6 +241,7 @@ func load_world(world_model, obj_model, options = []):
 
 	
 	var world_objs = world_model.world_objs
+	var item_instance = world_model.item_instances
 	
 	# This doesn't waste that much time,
 	# Building the meshes is the slow part!!
@@ -291,6 +295,21 @@ func load_world(world_model, obj_model, options = []):
 		if end != 0:
 			self.total_time_wasted += end - start
 	# End For
+		
+
+	for item in item_instance:
+		
+		var world_item = self.cWorldItem.new()
+		world_item.name = item.description
+		world_item.translation = item.position
+		world_item.rotation_degrees = item.rotation
+		world_item.item_instance = item
+		
+		if item.item_info.radius != 0:
+			world_item.scale = Vector3(item.item_info.radius, item.item_info.height, item.item_info.radius)
+			
+		mesh_viewer.add_child(world_item)
+		world_item.owner = mesh_viewer
 		
 		
 	print("Total time wasted %d" % self.total_time_wasted)

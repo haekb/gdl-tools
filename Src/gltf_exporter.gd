@@ -5,6 +5,9 @@ class GLTFExporter:
 	const MIN_INT = -9223372036854775807
 	const MAX_INT = 9223372036854775807
 	
+	var cWorldItem = load('res://Src/GDL/WorldItem.gd')
+	var cWorldMesh = load('res://Src/GDL/WorldMesh.gd')
+	
 	enum ComponentTypes {
 		BYTE = 5120,
 		UNSIGNED_BYTE = 5121,
@@ -128,7 +131,8 @@ class GLTFExporter:
 		
 		for mesh in self.scene_meshes:
 			
-			if mesh.get_class() == "MeshInstance":
+			if mesh.get_class() == "WorldMesh":
+				
 				mesh = mesh as MeshInstance
 				var mdt = MeshDataTool.new()
 				mdt.create_from_surface(mesh.mesh, 0)
@@ -309,15 +313,21 @@ class GLTFExporter:
 			
 			var rot = Quat(mesh.rotation)
 			var loc = mesh.translation
-			
-			nodes.append({
+			var node = {
 				'name': mesh.name,
 				'rotation': [ rot.x, rot.y, rot.z, rot.w ],
 				'translation': [ loc.x, loc.y, loc.z ],
-				'mesh': mesh_index,
-			})
+			}
 			
-			mesh_index += 1
+			if mesh.get_class() == "WorldMesh":
+				node['mesh'] = mesh_index
+				mesh_index += 1
+			elif mesh.get_class() == "WorldItem":
+				node['extras'] = mesh.get_extras()
+			
+			nodes.append(node)
+			
+			#mesh_index += 1
 			
 			pass
 		
